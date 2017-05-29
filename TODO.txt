@@ -1,0 +1,42 @@
+
+use array instead of map V
+
+camera look at
+
+******
+
+improve camera
+
+multiple zones V
+
+force based movement V
+direction / steering V
+
+flocking behaviour
+swarm intelligence
+
+circuits / thrusters
+time dilation
+
+*******
+better front end
+
+send client local information
+player in world
+
+animals, parasites, plants, genetics
+ents decelarate
+
+mass in collisions V
+
+temporal coherence / insertion sort V
+concurrent sort V
+sweep and prune / begin - end / multiple axis V
+parallelize detection, overlapping regions, go routines V
+
+rotational momentum
+AABB polygon collisions
+
+priori collision detection V
+entities have radius V
+
