@@ -19,8 +19,8 @@ func entityCollide(one agent.Entity, two agent.Entity) {
 	momentum_transfer := vec.Vec3Scale(two_velocity_delta, two.Mass())
 	one_velocity_delta := vec.Vec3Scale(vec.Vec3Scale(momentum_transfer, 1 / one.Mass()), -1)
 
-	//one_new_pos := vec.Vec3Add(two.GetPos(), vec.Vec3Scale(vec.Vec3Normal(impact_vec), -(one.Radius() + two.Radius())))
-	//one.SetPos(one_new_pos)
+	one_new_pos := vec.Vec3Add(two.GetPos(), vec.Vec3Scale(vec.Vec3Normal(impact_vec), -(one.Radius() + two.Radius())))
+	one.SetPos(one_new_pos)
 	
 	one.AddVelocity(one_velocity_delta)
 	two.AddVelocity(two_velocity_delta)

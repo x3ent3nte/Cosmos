@@ -12,24 +12,45 @@ type Odin struct {
 }
 
 func (odin *Odin) Simulate(time_delta float64) {
-	for i := 0; i < len(odin.ents); i++ {
+	/*for i := 0; i < len(odin.ents); i++ {
 		ent := odin.ents[i]
 		if ent.Alive() {
 			ent.Act(time_delta)
-			//ent.Move(time_delta / 1000.0)
+			ent.Move(time_delta)
 		} else {
 			odin.ents[i] = odin.ents[len(odin.ents) - 1]
 			odin.ents[len(odin.ents) - 1] = nil
 			odin.ents = odin.ents[:len(odin.ents) - 1]
 			i--
 		}
+	}*/
+	
+	num_workers := 4
+	var wg sync.WaitGroup
+	wg.Add(num_workers)
+
+	interval := len(odin.ents) / num_workers
+	start := 0
+	end := interval
+
+	for i := 0; i < num_workers - 1; i++ {
+		go SimulateWorker(odin.ents[start:end], time_delta, &wg)
+		start = end
+		end += interval
 	}
-	//physics.DetectCollisions(odin.ents)
-	physics.HandleMovement(odin.ents, time_delta)
+	go SimulateWorker(odin.ents[start:], time_delta, &wg)
+	wg.Wait()
+
+	physics.DetectCollisionsParallel(odin.ents)
+	//physics.HandleMovement(odin.ents, time_delta)
 }
 
-func (odin *Odin) GetEntities() []agent.Entity {
-	return odin.ents
+func SimulateWorker(ents []agent.Entity, time_delta float64, wg *sync.WaitGroup) {
+	for _, ent := range ents {
+		ent.Act(time_delta)
+		ent.Move(time_delta)
+	}
+	wg.Done()
 }
 
 func (odin *Odin) GetEntityJSONData() []string {
@@ -51,7 +72,7 @@ func (odin *Odin) GetEntityJSONData() []string {
 			start = end
 			end += interval
 		}
-		go EntityJSONDataWorker(odin.ents[start: end], data[start:], &wg)
+		go EntityJSONDataWorker(odin.ents[start:], data[start:], &wg)
 		
 		wg.Wait()
 	}

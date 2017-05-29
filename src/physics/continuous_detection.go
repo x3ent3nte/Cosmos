@@ -14,18 +14,17 @@ func HandleMovement(ents []agent.Entity, time_delta float64) {
 	mysort.QuickSort(SortEntityPairTime(collisions))
 	time_passed := 0.0
 	for _, col := range collisions {
-		time_seconds := (col.time - time_passed) / 1000.0
+		time_seconds := (col.time - time_passed)
 		for _, ent := range ents {
 			ent.Move(time_seconds)
 		}
 		entityCollide(col.one, col.two)
 		time_passed += col.time
 	}
-	time_left := (time_delta - time_passed) / 1000.0
+	time_left := (time_delta - time_passed)
 	for _, ent := range ents {
-			ent.Move(time_left)
+		ent.Move(time_left)
 	}
-
 }
 
 func predictCollisions(ents []agent.Entity, time_delta float64) []EntityPairTime {

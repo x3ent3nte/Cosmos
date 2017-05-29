@@ -5,6 +5,11 @@ import (
 	"mysort"
 )
 
+type EntityPair struct {
+	one agent.Entity
+	two agent.Entity
+}
+
 type EntityPairTime struct {
 	one agent.Entity
 	two agent.Entity

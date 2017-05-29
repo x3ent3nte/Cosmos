@@ -14,15 +14,15 @@ func main() {
 	server := server.CreateServer()
 	go server.StartServer()
 
-	odin := control.CreateOdin(750, 90000)
+	odin := control.CreateOdin(3500, 900000)
 
 	var last = time.Now().UnixNano()
 
 	for i := 0; i < 200000; i++ {
 		start := time.Now().UnixNano()
-		time_delta := float64(start - last) / 1000000.0
+		time_delta := float64(start - last) / 1000000000.0
 
-		fmt.Println("time taken: " , time_delta, "  frames/sec: ", 1000 / time_delta)
+		fmt.Println("time taken: " , time_delta, "  frames/sec: ", 1.0 / time_delta)
 		odin.Simulate(time_delta)
 		server.Serve(odin.GetEntityJSONData())
 
