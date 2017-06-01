@@ -10,6 +10,7 @@ import (
 
 type Agent struct {
 	sync.RWMutex
+	Type string `json:"type"`
 	Id int64 `json:"id"`
 
 	Pos vec.Vec3 `json:"pos"`

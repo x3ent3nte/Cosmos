@@ -3,6 +3,7 @@ package agent
 import (
 	"vec"
 	"sync"
+	"math/rand"
 )
 
 type Odin struct {
@@ -11,18 +12,6 @@ type Odin struct {
 }
 
 func (odin *Odin) Simulate(time_delta float64) {
-	/*for i := 0; i < len(odin.ents); i++ {
-		ent := odin.ents[i]
-		if ent.Alive() {
-			ent.Act(time_delta)
-			ent.Move(time_delta)
-		} else {
-			odin.ents[i] = odin.ents[len(odin.ents) - 1]
-			odin.ents[len(odin.ents) - 1] = nil
-			odin.ents = odin.ents[:len(odin.ents) - 1]
-			i--
-		}
-	}*/
 	odin.ents_spatial.SpatialReset()
 	for _, ent := range odin.ents {
 		odin.ents_spatial.SpatialAdd(ent)
@@ -94,11 +83,49 @@ func CreateOdin(initial_pop int, scope float64) Odin {
 	ents_spatial := CreateSpatialMap()
 	for i := 0; i < len(ents); i++ {
 		pos := vec.Vec3Random(scope)
-		var ent Entity = SpawnAnimal(int64(i), pos)
+		gen := rand.Intn(100)
+
+		var ent Entity
+		if gen < 10 {
+			ent = SpawnParasite(int64(i), pos)
+		} else {
+			if gen < 30 {
+				ent = SpawnPlant(int64(i), pos)
+			} else {
+				ent = SpawnAnimal(int64(i), pos)
+			}
+		}
 		ents[i] = ent
 	}
 	return Odin{ents, ents_spatial}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

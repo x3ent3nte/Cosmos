@@ -31,9 +31,6 @@ window.onload = function()
     var light_point = new THREE.PointLight(0xffffff, 0.9);
     scene.add(light_point);
 
-    //var sphere = createSphere();
-    //scene.add(sphere);
-
     function createSphere()
     {
         var geometry = new THREE.SphereGeometry(300, 9, 9);
@@ -54,7 +51,6 @@ window.onload = function()
         {
             var texture = THREE.ImageUtils.loadTexture("tex_space_ship.jpg");
             var material = new THREE.MeshBasicMaterial({map: texture});
-            //var material = new THREE.MultiMaterial(materials);
             var mesh = new THREE.Mesh(geometry, material);
             mesh.scale.set(65, 65, 65);
             
@@ -68,8 +64,6 @@ window.onload = function()
     function render() 
     {
         keyAction();
-
-        //createArwings();
 
         renderer.render(scene, camera);
         requestAnimationFrame(render);
@@ -254,9 +248,6 @@ window.onload = function()
         return [cx, cy, cz];
     }
 
-    requestAnimationFrame(render);
-
-
 
     document.onkeydown = pressKey;
     document.onkeyup = releaseKey;
@@ -282,7 +273,6 @@ window.onload = function()
         for(var i = 0; i < animals.length; i++)
         {
             var ani = JSON.parse(animals[i]);
-            //console.log(ani);
             var id = ani.id;
 
             if(!(id in meshes))
@@ -298,11 +288,15 @@ window.onload = function()
             mesh.position.y = ani.pos.y;
             mesh.position.z = ani.pos.z;
 
-            //sphere.position.x = ani.target.x;
-            //sphere.position.y = ani.target.y;
-            //sphere.position.z = ani.target.z;
-
-            //mesh.rotation.y = ani.euler.yaw
+            if (ani.type == "animal") {
+                mesh.material.color.setHex(0x6313E5);
+            } else {
+                if (ani.type == "plant") {
+                    mesh.material.color.setHex(0x3EC70E);
+                } else {
+                    mesh.material.color.setHex(0xC70E0E);
+                }
+            }
         }
     }
 
@@ -311,6 +305,8 @@ window.onload = function()
         var message = document.getElementById("message").value;
         socket.send(message);
     }
+
+    requestAnimationFrame(render);
 }
 
 

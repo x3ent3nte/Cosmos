@@ -31,6 +31,7 @@ func SpawnAnimal(id int64, pos vec.Vec3) *Animal{
 	target := vec.Vec3Add(pos, vec.Vec3Random(9000))
 	agent := Agent{
 		sync.RWMutex{},
+		"animal",
 		id,
 
 		pos,
