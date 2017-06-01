@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 	"fmt"
-	"control"
+	"agent"
 	"server"
 )
 
@@ -14,7 +14,7 @@ func main() {
 	server := server.CreateServer()
 	go server.StartServer()
 
-	odin := control.CreateOdin(3500, 900000)
+	odin := agent.CreateOdin(1500, 500000)
 
 	var last = time.Now().UnixNano()
 

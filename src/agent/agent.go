@@ -112,7 +112,7 @@ func (agent *Agent) SetPos(new_pos vec.Vec3) {
 	agent.Unlock()
 }
 
-func (agent *Agent) Velocity() vec.Vec3 {
+func (agent *Agent) GetVelocity() vec.Vec3 {
 	return agent.velocity
 }
 
@@ -122,11 +122,11 @@ func (agent *Agent) AddVelocity(delta vec.Vec3) {
 	agent.Unlock()
 }
 
-func (agent *Agent) Mass() float64 {
+func (agent *Agent) GetMass() float64 {
 	return agent.mass
 }
 
-func (agent *Agent) Radius() float64 {
+func (agent *Agent) GetRadius() float64 {
 	return agent.radius
 }
 

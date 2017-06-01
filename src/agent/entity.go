@@ -6,16 +6,17 @@ import(
 )
 
 type Entity interface {
-	Act(float64)
-	Move(float64)
 	Alive() bool
 	GetPos() vec.Vec3
-	SetPos(vec.Vec3)
-	Velocity() vec.Vec3
-	AddVelocity(vec.Vec3)
-	Mass() float64
-	Radius() float64
+	GetVelocity() vec.Vec3
+	GetMass() float64
+	GetRadius() float64
 	GetJSON() string
+
+	Act(float64)
+	Move(float64)
+	SetPos(vec.Vec3)
+	AddVelocity(vec.Vec3)
 }
 
 type SortEntityXPos []Entity
@@ -37,6 +38,7 @@ func (elems SortEntityXPos) Swap(i, j int) {
 func (elems SortEntityXPos) Reslice(start, end int) mysort.Sortable {
 	return SortEntityXPos(elems[start:end])
 }
+
 
 
 

@@ -24,17 +24,7 @@ func QuaternionRotation(point Vec3, theta float64, axis Vec3) Vec3{
 	var rotated = HamiltonProduct(HamiltonProduct(q, point_quaternion), q_inverse)
 	return Vec3FromQuaternion(rotated)
 }
-/*
-func QuaternionRotation(point Vec3, theta float64, axis Vec3) Vec3 {
-	var q = QuaternionCreate(theta, axis)
-	var q_vec = Vec3FromQuaternion(q)
 
-	var t = Vec3Scale(Vec3Cross(q_vec, point), 2)
-	var delta = Vec3Add(Vec3Scale(t, q.R), Vec3Cross(q_vec, t))
-
-	return Vec3Add(point, delta)
-}
-*/
 func QuaternionInverse(q Quaternion) Quaternion {
 	return Quaternion{q.R, -q.I, -q.J, -q.K}
 }
