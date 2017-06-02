@@ -11,10 +11,11 @@ type Animal struct{
 }
 
 func (ani *Animal) Act(time_delta float64) {
-	if ani.age > ani.lifespan  {
+	if ani.age > ani.lifespan {
 		ani.alive = false
 		return
 	} else {
+		_ = ani.odin.ents_spatial.SpatialGetZone(ani)
 		ani.calculateMovement(time_delta)
 		if ani.age == (ani.lifespan / 10) {
 			ani.Mitosis()
@@ -27,10 +28,11 @@ func (ani *Animal) Mitosis() {
 
 }
 
-func SpawnAnimal(id int64, pos vec.Vec3) *Animal{
+func SpawnAnimal(odin *Odin, id int64, pos vec.Vec3) *Animal{
 	target := vec.Vec3Add(pos, vec.Vec3Random(9000))
 	agent := Agent{
 		sync.RWMutex{},
+		odin,
 		"animal",
 		id,
 
@@ -47,6 +49,8 @@ func SpawnAnimal(id int64, pos vec.Vec3) *Animal{
 
 		true, 
 		0, 
-		10000}
+		10000,
+
+		CreateRocket()}
 	return &Animal{&agent}
 }

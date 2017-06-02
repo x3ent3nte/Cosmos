@@ -12,6 +12,7 @@ type Entity interface {
 	GetMass() float64
 	GetRadius() float64
 	GetJSON() string
+	GetType() string
 
 	Act(float64)
 	Move(float64)

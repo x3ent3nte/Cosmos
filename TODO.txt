@@ -24,7 +24,7 @@ better front end
 send client local information
 player in world
 
-animals, parasites, plants, genetics
+animals, parasites, plants, genetics V
 ents decelarate
 
 mass in collisions V

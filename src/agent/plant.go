@@ -19,10 +19,11 @@ func (plant *Plant) Act(time_delta float64) {
 	}
 }
 
-func SpawnPlant(id int64, pos vec.Vec3) *Plant{
+func SpawnPlant(odin *Odin, id int64, pos vec.Vec3) *Plant{
 	target := vec.Vec3Add(pos, vec.Vec3Random(9000))
 	agent := Agent{
 		sync.RWMutex{},
+		odin,
 		"plant",
 		id,
 
@@ -39,6 +40,8 @@ func SpawnPlant(id int64, pos vec.Vec3) *Plant{
 
 		true, 
 		0, 
-		10000}
+		10000,
+
+		CreateRocket()}
 	return &Plant{&agent}
 }

@@ -27,7 +27,11 @@ func CreateZoneOne(ent Entity) *Zone {
 
 func (spatial *SpatialMap) SpatialGetZone(ent Entity) []Entity {
 	key := getPosKey(ent)
-	return spatial.space[key].ents
+	if val, ok := spatial.space[key]; ok {
+		return val.ents
+	} else {
+		return nil
+	}
 }
 
 func (spatial *SpatialMap) SpatialAdd(ent Entity) {

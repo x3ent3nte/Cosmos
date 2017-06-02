@@ -81,23 +81,24 @@ func EntityJSONDataWorker(ents []Entity, data []string, wg *sync.WaitGroup) {
 func CreateOdin(initial_pop int, scope float64) Odin {
 	ents := make([]Entity, initial_pop)
 	ents_spatial := CreateSpatialMap()
+	odin := Odin{ents, ents_spatial}
 	for i := 0; i < len(ents); i++ {
 		pos := vec.Vec3Random(scope)
 		gen := rand.Intn(100)
 
 		var ent Entity
 		if gen < 10 {
-			ent = SpawnParasite(int64(i), pos)
+			ent = SpawnParasite(&odin, int64(i), pos)
 		} else {
 			if gen < 30 {
-				ent = SpawnPlant(int64(i), pos)
+				ent = SpawnPlant(&odin, int64(i), pos)
 			} else {
-				ent = SpawnAnimal(int64(i), pos)
+				ent = SpawnAnimal(&odin, int64(i), pos)
 			}
 		}
 		ents[i] = ent
 	}
-	return Odin{ents, ents_spatial}
+	return odin
 }
 
 

@@ -19,10 +19,11 @@ func (para *Parasite) Act(time_delta float64) {
 	}
 }
 
-func SpawnParasite(id int64, pos vec.Vec3) *Parasite{
+func SpawnParasite(odin *Odin, id int64, pos vec.Vec3) *Parasite{
 	target := vec.Vec3Add(pos, vec.Vec3Random(9000))
 	agent := Agent{
 		sync.RWMutex{},
+		odin,
 		"parasite",
 		id,
 
@@ -39,6 +40,8 @@ func SpawnParasite(id int64, pos vec.Vec3) *Parasite{
 
 		true, 
 		0, 
-		10000}
+		10000,
+
+		CreateRocket()}
 	return &Parasite{&agent}
 }

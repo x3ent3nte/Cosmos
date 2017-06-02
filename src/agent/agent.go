@@ -6,10 +6,12 @@ import (
 	"math"
 	"encoding/json"
 	"sync"
+	"strings"
 )
 
 type Agent struct {
 	sync.RWMutex
+	odin *Odin
 	Type string `json:"type"`
 	Id int64 `json:"id"`
 
@@ -27,6 +29,26 @@ type Agent struct {
 	alive bool
 	age int64
 	lifespan int64
+
+	rocket Rocket
+}
+
+func (agent *Agent) findClosestPlant(ents []Entity) Entity{
+	var closest_dist float64 = math.MaxFloat64
+	var closest Entity = nil
+
+	for _, ent := range ents {
+		if agent != ent {
+			if strings.Compare(ent.GetType(), "plant") == 0 {
+				dist := vec.Vec3DistanceBetween(agent.GetPos(), ent.GetPos())
+				if dist < closest_dist {
+					dist = closest_dist
+					closest = ent
+				}
+			}
+		}
+	}
+	return closest
 }
 
 func (agent *Agent) calculateMovement(time_delta float64) {
@@ -38,7 +60,7 @@ func (agent *Agent) calculateMovement(time_delta float64) {
 
 	agent.turn(time_delta)
 	agent.thrustForward(time_delta)
-	agent.stabilize(time_delta)
+	//agent.stabilize(time_delta)
 
 	agent.dist_delta = vec.Vec3Scale(agent.velocity, time_delta)
 
@@ -47,7 +69,6 @@ func (agent *Agent) calculateMovement(time_delta float64) {
 		//agent.Target = vec.Vec3Random(35000)
 	}
 }
-
 
 func (agent *Agent) turn(time_delta float64) {
 	var course = vec.Vec3Sub(agent.Target, agent.Pos)
@@ -65,10 +86,8 @@ func (agent *Agent) turn(time_delta float64) {
 }
 
 func (agent *Agent) thrustForward(time_delta float64) {
-	var forward_norm = vec.Vec3Normal(agent.forward)
-	var thrust float64 = 30000.0
-	force := vec.Vec3Scale(forward_norm, thrust)
-	agent.applyForce(force, time_delta)
+	impulse := agent.rocket.Thrust(vec.Vec3Normal(agent.forward), 1.0, time_delta)
+	agent.applyImpulse(impulse)
 }
 
 func (agent *Agent) stabilize(time_delta float64) {
@@ -78,15 +97,20 @@ func (agent *Agent) stabilize(time_delta float64) {
 	var course_normal = vec.Vec3Normal(course_relative)
 	var force_dir = vec.QuaternionRotation(velocity_normal, math.Pi, course_normal)
 
-	var thrust float64 = 15000.0
-	force := vec.Vec3Scale(force_dir, thrust)
-	agent.applyForce(force, time_delta)
+	impulse := agent.rocket.Thrust(force_dir, 0.4, time_delta)
+	agent.applyImpulse(impulse)
 }
 
 func (agent *Agent) applyForce(force vec.Vec3, time_delta float64) {
 	agent.Lock()
-	velocity_delta := vec.Vec3Scale(vec.Vec3Scale(force, 1 /  agent.mass), time_delta)
-	agent.velocity = vec.Vec3Add(agent.velocity, velocity_delta)
+	agent.applyImpulse(vec.Vec3Scale(force, time_delta))
+	agent.Unlock()
+}
+
+func (agent *Agent) applyImpulse(impulse vec.Vec3) {
+	agent.Lock()
+	velo_delta := vec.Vec3Scale(impulse, 1 / agent.mass)
+	agent.velocity = vec.Vec3Add(agent.velocity, velo_delta)
 	agent.Unlock()
 }
 
@@ -129,6 +153,10 @@ func (agent *Agent) GetMass() float64 {
 
 func (agent *Agent) GetRadius() float64 {
 	return agent.radius
+}
+
+func (agent *Agent) GetType() string {
+	return agent.Type
 }
 
 func (agent *Agent) GetJSON() string {
