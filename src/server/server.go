@@ -30,29 +30,35 @@ func (server *Server) StartServer() {
 }
 
 func (server *Server) handleConnections(write http.ResponseWriter, read *http.Request) {
-	ws, err := server.upgrader.Upgrade(write, read, nil)
+	conn, err := server.upgrader.Upgrade(write, read, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer ws.Close()
 
-	server.clients[ws] = true
+	server.clients[conn] = true
 
-	for {
-		var msg Message 
-		err := ws.ReadJSON(&msg)
-		if err != nil {
-			log.Printf("error: %v", err)
-			delete(server.clients, ws)
-			break
+	/*go func(conn *websocket.Conn) {
+		for {
+			m_type, msg, _ := conn.ReadMessage()
+			log.Println("mtype: ", m_type, " msg: ", msg)
 		}
-	}
+	}(conn)*/
+	
+	go func (conn *websocket.Conn) {
+		for {
+			_, msg, err := conn.ReadMessage()
+			if err != nil {
+				log.Printf("error: %v", err)
+				delete(server.clients, conn)
+				break
+			}
+			log.Println(msg)
+		}
+		defer conn.Close()
+	}(conn)
 }
 
 func CreateServer() Server{
 	return Server{make(map[*websocket.Conn]bool), websocket.Upgrader{}}
 }
-
-type Message struct {}
-
 

@@ -49,7 +49,7 @@ func (odin *Odin) GetEntityJSONData() []string {
 	data := make([]string, len(odin.ents)) 
 	if len(odin.ents) < 10 {
 		for i, ent := range odin.ents {
-		data[i] = ent.GetJSON()
+			data[i] = ent.GetJSON()
 		}
 	} else {
 		num_workers := 4

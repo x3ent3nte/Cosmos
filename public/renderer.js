@@ -54,7 +54,6 @@ window.onload = function() {
         );
     }
 
-
     function render() {
         keyAction();
         renderer.render(scene, camera);
@@ -218,7 +217,8 @@ window.onload = function() {
 
     window.addEventListener("resize", onWindowResize, false);
 
-    socket = new WebSocket("ws://localhost:8000/ws");
+    var socket = new WebSocket("ws://localhost:8000/ws");
+    socket.binaryType = "arraybuffer";
 
     socket.onopen = function() {
         console.log("connected to server");
@@ -258,11 +258,26 @@ window.onload = function() {
         }
     }
 
-    function send() {
-        var message = document.getElementById("message").value;
-        socket.send(message);
+    function sendPressed() {
+        var msg = 0;
+        if(pressed_keys[87]) { msg = setBitAt(msg, 0); }
+        if(pressed_keys[83]) { msg = setBitAt(msg, 1); }
+        if(pressed_keys[65]) { msg = setBitAt(msg, 2); }
+        if(pressed_keys[68]) { msg = setBitAt(msg, 3); }
+        if(pressed_keys[81]) { msg = setBitAt(msg, 4); }
+        if(pressed_keys[69]) { msg = setBitAt(msg, 5); }
+        console.log(msg);
+        msg_arr = [msg]
+        data = new Uint8Array(msg_arr);
+        socket.send(data.buffer);
     }
 
+    function setBitAt(val, pos) {
+        var mask = 1 << pos;
+        return val | mask;
+    }
+
+    setInterval(sendPressed, 32);
     requestAnimationFrame(render);
 }
 
