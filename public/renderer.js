@@ -267,7 +267,7 @@ window.onload = function() {
         if(pressed_keys[81]) { msg = setBitAt(msg, 4); }
         if(pressed_keys[69]) { msg = setBitAt(msg, 5); }
         console.log(msg);
-        msg_arr = [msg]
+        msg_arr = [msg];
         data = new Uint8Array(msg_arr);
         socket.send(data.buffer);
     }

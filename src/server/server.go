@@ -6,15 +6,30 @@ import (
     "github.com/gorilla/websocket"
 )
 
+type Client struct {
+	code int
+	conn *websocket.Conn
+}
+
 type Server struct {
-	clients map[*websocket.Conn]bool
+	clients map[*Client]bool
 	upgrader websocket.Upgrader
 }
 
 func (server *Server) Serve(data []string) {
 	for client := range server.clients {
-		client.WriteJSON(data)
+		client.conn.WriteJSON(data)
 	}
+}
+
+func (server *Server) GetClientsData() []int {
+	data := make([]int, len(server.clients))
+	i := 0
+	for client := range server.clients {
+		data[i] = client.code 
+		i++
+	}
+	return data
 }
 
 func (server *Server) StartServer() {
@@ -35,30 +50,24 @@ func (server *Server) handleConnections(write http.ResponseWriter, read *http.Re
 		log.Fatal(err)
 	}
 
-	server.clients[conn] = true
-
-	/*go func(conn *websocket.Conn) {
-		for {
-			m_type, msg, _ := conn.ReadMessage()
-			log.Println("mtype: ", m_type, " msg: ", msg)
-		}
-	}(conn)*/
+	client := Client{0, conn}
+	server.clients[&client] = true
 	
-	go func (conn *websocket.Conn) {
+	go func (client *Client) {
 		for {
-			_, msg, err := conn.ReadMessage()
+			_, msg, err := client.conn.ReadMessage()
 			if err != nil {
 				log.Printf("error: %v", err)
-				delete(server.clients, conn)
+				delete(server.clients, client)
 				break
 			}
 			log.Println(msg)
 		}
 		defer conn.Close()
-	}(conn)
+	}(&client)
 }
 
 func CreateServer() Server{
-	return Server{make(map[*websocket.Conn]bool), websocket.Upgrader{}}
+	return Server{make(map[*Client]bool), websocket.Upgrader{}}
 }
 
