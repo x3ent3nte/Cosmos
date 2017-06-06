@@ -101,7 +101,7 @@ window.onload = function() {
         forward = vec3Scale(forward, camera_speed);
         right = vec3Scale(right, camera_speed);
         up = vec3Scale(up, camera_speed);
-     
+        /*
         if(pressed_keys[87]) { // W
             camera.position.x -= forward[0];
             camera.position.y += forward[1];
@@ -145,6 +145,7 @@ window.onload = function() {
         if(pressed_keys[39]) { // right
             camera.rotation.y -= 0.01;
         }
+        */
     }
 
     function pressKey(evt) {
@@ -210,6 +211,33 @@ window.onload = function() {
         return [cx, cy, cz];
     }
 
+    function updateWorld(ents) {
+        for (var i = 0; i < ents.length; i++) {
+            var ent = JSON.parse(ents[i]);
+            var id = ent.id;
+
+            if (!(id in meshes)) {
+                var sphere = createSphere();
+                meshes[id] = sphere;
+                scene.add(sphere);
+                //createArwing(id);
+            }
+
+            var mesh = meshes[id];
+            mesh.position.set(ent.pos.x, ent.pos.y, ent.pos.z);
+
+            if (ent.type == "animal") {
+                mesh.material.color.setHex(0x6313E5);
+            } else {
+                if (ent.type == "plant") {
+                    mesh.material.color.setHex(0x3EC70E);
+                } else {
+                    mesh.material.color.setHex(0xC70E0E);
+                }
+            }
+        }
+    }
+
 
     document.onkeydown = pressKey;
     document.onkeyup = releaseKey;
@@ -229,32 +257,9 @@ window.onload = function() {
     }
 
     socket.onmessage = function(message) {
-        var animals = JSON.parse(message.data);
-        for(var i = 0; i < animals.length; i++){
-            var ani = JSON.parse(animals[i]);
-            var id = ani.id;
-
-            if(!(id in meshes)) {
-                var sphere = createSphere();
-                meshes[id] = sphere;
-                scene.add(sphere);
-                //createArwing(id);
-            }
-
-            var mesh = meshes[id];
-            mesh.position.x = ani.pos.x;
-            mesh.position.y = ani.pos.y;
-            mesh.position.z = ani.pos.z;
-
-            if (ani.type == "animal") {
-                mesh.material.color.setHex(0x6313E5);
-            } else {
-                if (ani.type == "plant") {
-                    mesh.material.color.setHex(0x3EC70E);
-                } else {
-                    mesh.material.color.setHex(0xC70E0E);
-                }
-            }
+        var msg = JSON.parse(message.data);
+        if (msg.type == "update") {
+            updateWorld(msg.data);
         }
     }
 
@@ -266,7 +271,7 @@ window.onload = function() {
         if(pressed_keys[68]) { msg = setBitAt(msg, 3); }
         if(pressed_keys[81]) { msg = setBitAt(msg, 4); }
         if(pressed_keys[69]) { msg = setBitAt(msg, 5); }
-        console.log(msg);
+    
         msg_arr = [msg];
         data = new Uint8Array(msg_arr);
         socket.send(data.buffer);

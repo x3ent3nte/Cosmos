@@ -5,7 +5,13 @@ import (
 	"log"
 	"net/http"
     "github.com/gorilla/websocket"
+    "concurrent"
 )
+
+type Message struct {
+	Type string `json:"type"`
+	Data interface{} `json:"data"`
+}
 
 type Client struct {
 	id int64
@@ -15,14 +21,15 @@ type Client struct {
 
 type Server struct {
 	sync.RWMutex
-	id_next int64
+	ids concurrent.IdHandler
 	clients map[*Client]bool
 	upgrader websocket.Upgrader
 }
 
-func (server *Server) Serve(data []string) {
+func (server *Server) ServeData(data []string) {
+	msg := Message{"update", data}
 	for client := range server.clients {
-		client.conn.WriteJSON(data)
+		client.conn.WriteJSON(msg)
 	}
 }
 
@@ -48,27 +55,18 @@ func (server *Server) GetClientsData() map[int64]int {
 	return data
 }
 
-func (server *Server) StartServer() {
-	fs := http.FileServer(http.Dir("../public"))
-	http.Handle("/", fs)
-	http.HandleFunc("/ws", server.handleConnections)
-
-	log.Println("http server started on :8000")
-	err := http.ListenAndServe(":8000", nil)
-	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
-	}
-}
-
 func (server *Server) handleConnections(write http.ResponseWriter, read *http.Request) {
 	conn, err := server.upgrader.Upgrade(write, read, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	client := Client{server.id_next, 0, conn}
-	server.id_next += 1
+	client := Client{server.ids.NextId(), 0, conn}
 	server.AddClient(&client)
+
+	//id_msg := CreateMessage("id", client.id)
+	id_msg := Message{"id", client.id}
+	conn.WriteJSON(id_msg)
 	
 	go func (client *Client) {
 		for {
@@ -84,8 +82,20 @@ func (server *Server) handleConnections(write http.ResponseWriter, read *http.Re
 	}(&client)
 }
 
+func (server *Server) StartServer() {
+	fs := http.FileServer(http.Dir("../public"))
+	http.Handle("/", fs)
+	http.HandleFunc("/ws", server.handleConnections)
+
+	log.Println("http server started on :8000")
+	err := http.ListenAndServe(":8000", nil)
+	if err != nil {
+		log.Fatal("ListenAndServe: ", err)
+	}
+}
+
 func CreateServer() Server{
-	return Server{sync.RWMutex{}, int64(0), make(map[*Client]bool), websocket.Upgrader{}}
+	return Server{sync.RWMutex{}, concurrent.CreateIdHandler(), make(map[*Client]bool), websocket.Upgrader{}}
 }
 
 

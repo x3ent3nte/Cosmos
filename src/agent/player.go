@@ -18,6 +18,10 @@ func (player *Player) Act(time_delta float64) {
 		impulse := player.rocket.Thrust(vec.Vec3Normal(player.forward), 1.0, time_delta)
 		player.applyImpulse(impulse)
 	}
+	if bit.IsBitOneAt(player.keycode, 1) {
+		impulse := player.rocket.Thrust(vec.Vec3Normal(vec.Vec3Scale(player.forward, -1)), 1.0, time_delta)
+		player.applyImpulse(impulse)
+	}
 }
 
 func (player *Player) UpdateKeyCode(new_keycode int) {

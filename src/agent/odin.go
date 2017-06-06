@@ -4,24 +4,11 @@ import (
 	"vec"
 	"sync"
 	"math/rand"
-	"log"
+	"concurrent"
 )
 
-type IdHandler struct {
-	sync.RWMutex
-	id int64
-}
-
-func (ids *IdHandler) nextId() int64 {
-	ids.Lock()
-	next := ids.id
-	ids.id++
-	ids.Unlock()
-	return next
-}
-
 type Odin struct {
-	ids IdHandler
+	ids concurrent.IdHandler
 	players map[int64]*Player
 	ents []Entity
 	ents_spatial SpatialMap
@@ -29,11 +16,10 @@ type Odin struct {
 
 func (odin *Odin) UpdatePlayerData(data map[int64]int) {
 	for id, code := range data {
-		log.Println(code)
 		if player, ok := odin.players[id]; ok {
 			player.UpdateKeyCode(code)
 		} else {
-			player_new := SpawnPlayer(odin, id, odin.ids.nextId(), vec.Vec3Random(100))
+			player_new := SpawnPlayer(odin, id, odin.ids.NextId(), vec.Vec3Random(100))
 			odin.players[id] = player_new
 			player_new.UpdateKeyCode(code)
 			odin.AddEntity(player_new)
@@ -116,14 +102,14 @@ func CreateOdin(initial_pop int, scope float64) Odin {
 	players := make(map[int64]*Player)
 	ents := make([]Entity, initial_pop)
 	ents_spatial := CreateSpatialMap()
-	ids := IdHandler{sync.RWMutex{}, int64(0)}
+	ids := concurrent.CreateIdHandler()
 
 	odin := Odin{ids, players, ents, ents_spatial}
 
 	for i := 0; i < len(ents); i++ {
 		pos := vec.Vec3Random(scope)
 		gen := rand.Intn(100)
-		id := odin.ids.nextId()
+		id := odin.ids.NextId()
 
 		var ent Entity
 		if gen < 10 {
