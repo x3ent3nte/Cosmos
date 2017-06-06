@@ -4,11 +4,41 @@ import (
 	"vec"
 	"sync"
 	"math/rand"
+	"log"
 )
 
+type IdHandler struct {
+	sync.RWMutex
+	id int64
+}
+
+func (ids *IdHandler) nextId() int64 {
+	ids.Lock()
+	next := ids.id
+	ids.id++
+	ids.Unlock()
+	return next
+}
+
 type Odin struct {
+	ids IdHandler
+	players map[int64]*Player
 	ents []Entity
 	ents_spatial SpatialMap
+}
+
+func (odin *Odin) UpdatePlayerData(data map[int64]int) {
+	for id, code := range data {
+		log.Println(code)
+		if player, ok := odin.players[id]; ok {
+			player.UpdateKeyCode(code)
+		} else {
+			player_new := SpawnPlayer(odin, id, odin.ids.nextId(), vec.Vec3Random(100))
+			odin.players[id] = player_new
+			player_new.UpdateKeyCode(code)
+			odin.AddEntity(player_new)
+		}
+	}
 }
 
 func (odin *Odin) Simulate(time_delta float64) {
@@ -45,6 +75,10 @@ func SimulateWorker(ents []Entity, time_delta float64, wg *sync.WaitGroup) {
 	wg.Done()
 }
 
+func (odin *Odin) AddEntity(ent Entity) {
+	odin.ents = append(odin.ents, ent)
+}
+
 func (odin *Odin) GetEntityJSONData() []string {
 	data := make([]string, len(odin.ents)) 
 	if len(odin.ents) < 10 {
@@ -79,21 +113,26 @@ func EntityJSONDataWorker(ents []Entity, data []string, wg *sync.WaitGroup) {
 }
 
 func CreateOdin(initial_pop int, scope float64) Odin {
+	players := make(map[int64]*Player)
 	ents := make([]Entity, initial_pop)
 	ents_spatial := CreateSpatialMap()
-	odin := Odin{ents, ents_spatial}
+	ids := IdHandler{sync.RWMutex{}, int64(0)}
+
+	odin := Odin{ids, players, ents, ents_spatial}
+
 	for i := 0; i < len(ents); i++ {
 		pos := vec.Vec3Random(scope)
 		gen := rand.Intn(100)
+		id := odin.ids.nextId()
 
 		var ent Entity
 		if gen < 10 {
-			ent = SpawnParasite(&odin, int64(i), pos)
+			ent = SpawnParasite(&odin, id, pos)
 		} else {
 			if gen < 30 {
-				ent = SpawnPlant(&odin, int64(i), pos)
+				ent = SpawnPlant(&odin, id, pos)
 			} else {
-				ent = SpawnAnimal(&odin, int64(i), pos)
+				ent = SpawnAnimal(&odin, id, pos)
 			}
 		}
 		ents[i] = ent

@@ -1,17 +1,21 @@
 package server
 
 import (
+	"sync"
 	"log"
 	"net/http"
     "github.com/gorilla/websocket"
 )
 
 type Client struct {
-	code int
+	id int64
+	keycode int
 	conn *websocket.Conn
 }
 
 type Server struct {
+	sync.RWMutex
+	id_next int64
 	clients map[*Client]bool
 	upgrader websocket.Upgrader
 }
@@ -22,13 +26,25 @@ func (server *Server) Serve(data []string) {
 	}
 }
 
-func (server *Server) GetClientsData() []int {
-	data := make([]int, len(server.clients))
-	i := 0
+func (server *Server) AddClient(client *Client) {
+	server.Lock()
+	server.clients[client] = true
+	server.Unlock()
+}
+
+func (server *Server) RemoveClient(client *Client) {
+	server.Lock()
+	delete(server.clients, client)
+	server.Unlock()
+}
+
+func (server *Server) GetClientsData() map[int64]int {
+	server.Lock()
+	data := make(map[int64]int)
 	for client := range server.clients {
-		data[i] = client.code 
-		i++
+		data[client.id] = client.keycode
 	}
+	server.Unlock()
 	return data
 }
 
@@ -50,24 +66,38 @@ func (server *Server) handleConnections(write http.ResponseWriter, read *http.Re
 		log.Fatal(err)
 	}
 
-	client := Client{0, conn}
-	server.clients[&client] = true
+	client := Client{server.id_next, 0, conn}
+	server.id_next += 1
+	server.AddClient(&client)
 	
 	go func (client *Client) {
 		for {
 			_, msg, err := client.conn.ReadMessage()
 			if err != nil {
 				log.Printf("error: %v", err)
-				delete(server.clients, client)
+				server.RemoveClient(client)
 				break
 			}
-			log.Println(msg)
+			client.keycode = int(msg[0])
 		}
 		defer conn.Close()
 	}(&client)
 }
 
 func CreateServer() Server{
-	return Server{make(map[*Client]bool), websocket.Upgrader{}}
+	return Server{sync.RWMutex{}, int64(0), make(map[*Client]bool), websocket.Upgrader{}}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 

@@ -4,34 +4,27 @@ import (
 	"vec"
 	"sync"
 	"math"
+	"bit"
 )
 
 type Player struct {
 	*Agent
-	pressed *[]bool
+	client_id int64
+	keycode int
 }
 
 func (player *Player) Act(time_delta float64) {
-	if (*player.pressed)[87] { //W
-		player.rocket.Thrust(vec.Vec3Normal(player.forward), 1.0, time_delta)
-	}
-	if (*player.pressed)[83] { //S
-	}
-	if (*player.pressed)[65] { //A
-	}
-	if (*player.pressed)[68] { //D
-	}
-	if (*player.pressed)[81] { //Q
-	}
-	if (*player.pressed)[69] { //E
+	if bit.IsBitOneAt(player.keycode, 0) {
+		impulse := player.rocket.Thrust(vec.Vec3Normal(player.forward), 1.0, time_delta)
+		player.applyImpulse(impulse)
 	}
 }
 
-func (player *Player) UpdatePressed(new_pressed *[]bool) {
-	player.pressed = new_pressed
+func (player *Player) UpdateKeyCode(new_keycode int) {
+	player.keycode = new_keycode
 }
 
-func CreatePlayer(odin *Odin, id int64, pos vec.Vec3) *Player {
+func SpawnPlayer(odin *Odin, client_id int64, id int64, pos vec.Vec3) *Player {
 	agent := Agent{
 		sync.RWMutex{},
 		odin,
@@ -53,8 +46,7 @@ func CreatePlayer(odin *Odin, id int64, pos vec.Vec3) *Player {
 		0, 
 		10000,
 		CreateRocket()}
-	pressed := make([]bool, 222)
-	return &Player{&agent, &pressed}
+	return &Player{&agent, client_id, 0}
 }
 
 
