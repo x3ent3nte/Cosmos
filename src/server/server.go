@@ -19,6 +19,10 @@ type Client struct {
 	conn *websocket.Conn
 }
 
+func (client *Client) setKeycode(new_keycode int) {
+	client.keycode = new_keycode
+}
+
 type Server struct {
 	sync.RWMutex
 	ids concurrent.IdHandler
@@ -76,9 +80,9 @@ func (server *Server) handleConnections(write http.ResponseWriter, read *http.Re
 				server.RemoveClient(client)
 				break
 			}
-			client.keycode = int(msg[0])
+			client.setKeycode(int(msg[0]))
 		}
-		defer conn.Close()
+		conn.Close()
 	}(&client)
 }
 
