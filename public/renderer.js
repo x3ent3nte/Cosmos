@@ -67,10 +67,10 @@ window.onload = function() {
         var y_vector = Math.sin(camera.rotation.x);
         var x_vector = Math.sin(camera.rotation.y) * Math.cos(camera.rotation.x);
 
-        var forward = [x_vector, y_vector, z_vector];
+        var forward = {x: x_vector, y: y_vector, z: z_vector};
         var up = [0, 1, 0];
-        var right = crossProduct(forward, up);
-        up = crossProduct(forward, right);
+        var right = vec3Cross(forward, up);
+        up = vec3Cross(forward, right);
 
         forward = vec3Scale(forward, camera_speed);
         right = vec3Scale(right, camera_speed);

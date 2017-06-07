@@ -3,7 +3,7 @@ package main
 import (
 	"math/rand"
 	"time"
-	//"fmt"
+	//"log"
 	"agent"
 	"server"
 )
@@ -22,7 +22,7 @@ func main() {
 		start := time.Now().UnixNano()
 		time_delta := float64(start - last) / 1000000000.0
 
-		//fmt.Println("time taken: " , time_delta, "  frames/sec: ", 1.0 / time_delta)
+		//log.Println("time taken: " , time_delta, "  frames/sec: ", 1.0 / time_delta)
 		client_data := server.GetClientsData()
 		odin.UpdatePlayerData(client_data)
 		odin.Simulate(time_delta)
@@ -33,3 +33,10 @@ func main() {
 		time.Sleep(time.Millisecond * 1)
 	}
 }
+
+
+
+
+
+
+

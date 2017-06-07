@@ -135,24 +135,3 @@ func CreateOdin(initial_pop int, scope float64) Odin {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
