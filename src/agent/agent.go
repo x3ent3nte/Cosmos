@@ -17,7 +17,11 @@ type Agent struct {
 
 	Pos vec.Vec3 `json:"pos"`
 	Target vec.Vec3 `json:"target"`
+
 	forward vec.Vec3
+	up vec.Vec3
+	right vec.Vec3
+
 	roll float64
 	Euler vec.Euler `json:"euler"`
 
@@ -31,6 +35,14 @@ type Agent struct {
 	lifespan int64
 
 	rocket Rocket
+}
+
+func (agent *Agent) calculateDirectionVectors() {
+	up := vec.Vec3{0.0, 1.0, 0.0}
+	right := vec.Vec3Cross(agent.forward, up)
+	up = vec.Vec3Cross(right, agent.forward)
+	agent.up = up
+	agent.right = right
 }
 
 func (agent *Agent) findClosestPlant(ents []Entity) Entity{

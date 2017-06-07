@@ -24,5 +24,5 @@ func (rocket *Rocket) isLowOnFuel() bool {
 }
 
 func CreateRocket() Rocket {
-	return Rocket{1500000, 1500, 80}
+	return Rocket{1500000, 3000, 80}
 }
