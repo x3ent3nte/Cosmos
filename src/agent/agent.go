@@ -22,10 +22,11 @@ type Agent struct {
 	up vec.Vec3
 	right vec.Vec3
 
-	roll float64
+	Roll float64 `json:"roll"`
 	Euler vec.Euler `json:"euler"`
 
 	velocity vec.Vec3
+	angular_velocity vec.Vec3
 	dist_delta vec.Vec3
 	mass float64
 	radius float64
@@ -45,7 +46,7 @@ func (agent *Agent) calculateDirectionVectors() {
 	agent.right = right
 }
 
-func (agent *Agent) findClosestPlant(ents []Entity) Entity{
+func (agent *Agent) findClosestPlant(ents []Entity) Entity {
 	var closest_dist float64 = math.MaxFloat64
 	var closest Entity = nil
 
@@ -93,7 +94,7 @@ func (agent *Agent) turn(time_delta float64) {
 	var axis = vec.Vec3Cross(agent.forward, course_normal)
 
 	var delta_turn = time_delta
-	var new_forward = vec.QuaternionRotation(agent.forward,  delta_turn, axis)
+	var new_forward = vec.QuaternionRotation(agent.forward, delta_turn, axis)
 	agent.forward = new_forward
 }
 
@@ -126,9 +127,31 @@ func (agent *Agent) applyImpulse(impulse vec.Vec3) {
 	agent.Unlock()
 }
 
+func (agent *Agent) applyTorque(force vec.Vec3, point vec.Vec3, time_delta float64) {
+	agent.Lock()
+	lever := vec.Vec3Sub(agent.Pos, point)
+	lever_dist := vec.Vec3Mag(lever)
+	cos_sim := vec.Vec3CosineSimilarity(lever, force)
+
+	linear_force := vec.Vec3Scale(force, cos_sim)
+	linear_impulse := vec.Vec3Scale(linear_force, time_delta)
+	agent.applyImpulse(linear_impulse)
+
+	force_perpendicular := vec.Vec3Scale(force, 1 - math.Abs(cos_sim))
+	_= vec.Vec3Scale(force_perpendicular, lever_dist) // torque
+	agent.Unlock()
+}
+
 func (agent *Agent) Move(time_delta float64) {
 	dist := vec.Vec3Scale(agent.velocity, time_delta)
 	agent.Pos = vec.Vec3Add(agent.Pos, dist)
+}
+
+func (agent *Agent) Rotate(time_delta float64) {
+	angle_delta := vec.Vec3Scale(agent.angular_velocity, time_delta)
+	agent.forward = vec.QuaternionRotation(agent.forward, angle_delta.X, vec.Vec3{1.0, 0.0, 0.0})
+	agent.forward = vec.QuaternionRotation(agent.forward, angle_delta.Y, vec.Vec3{0.0, 1.0, 0.0})
+	agent.forward = vec.QuaternionRotation(agent.forward, angle_delta.Z, vec.Vec3{0.0, 0.0, 1.0})
 }
 
 func (agent *Agent) Act(time_delta float64) {

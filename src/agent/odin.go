@@ -57,6 +57,7 @@ func SimulateWorker(ents []Entity, time_delta float64, wg *sync.WaitGroup) {
 	for _, ent := range ents {
 		ent.Act(time_delta)
 		ent.Move(time_delta)
+		ent.Rotate(time_delta)
 	}
 	wg.Done()
 }

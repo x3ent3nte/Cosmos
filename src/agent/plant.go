@@ -37,6 +37,7 @@ func SpawnPlant(odin *Odin, id int64, pos vec.Vec3) *Plant{
 
 		vec.Vec3{0.0, 0.0, 0.0},
 		vec.Vec3{0.0, 0.0, 0.0},
+		vec.Vec3{0.0, 0.0, 0.0},
 		90.0, 
 		300.0,
 

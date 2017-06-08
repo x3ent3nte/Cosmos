@@ -64,6 +64,7 @@ func SpawnPlayer(odin *Odin, client_id int64, id int64, pos vec.Vec3) *Player {
 
 		vec.Vec3{0.0, 0.0, 0.0},
 		vec.Vec3{0.0, 0.0, 0.0},
+		vec.Vec3{0.0, 0.0, 0.0},
 		90.0, 
 		300.0,
 
