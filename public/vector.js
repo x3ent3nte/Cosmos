@@ -25,3 +25,11 @@ function vec3Cross(a, b) {
     var cz =  (a.x * b.y) - (a.y * b.x);
     return {x: cx, y: cy, z: cz};
 }
+
+function vec3Yaw(a) {
+    return Math.atan2(a.z, a.x);
+}
+
+function vec3Pitch(a) {
+    return Math.asin(a.y);
+}

@@ -143,6 +143,11 @@ window.onload = function() {
             var mesh = meshes[id];
             mesh.position.set(ent.pos.x, ent.pos.y, ent.pos.z);
 
+            //var quaternion = new THREE.Quaternion();
+            //quaternion.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), Math.PI / 2 );
+            //var vector = new THREE.Vector3( 1, 0, 0 );
+            //vector.applyQuaternion( quaternion );
+
             if (ent.type == "animal") {
                 mesh.material.color.setHex(0x6313E5);
             } else {

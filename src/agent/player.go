@@ -16,11 +16,11 @@ type Player struct {
 func (player *Player) Act(time_delta float64) {
 	player.calculateDirectionVectors()
 	if bit.IsBitOneAt(player.keycode, 0) {
-		impulse := player.rocket.Thrust(vec.Vec3Normal(player.forward), 1.0, time_delta)
+		impulse := player.rocket.Thrust(vec.Vec3Normal(player.Forward), 1.0, time_delta)
 		player.applyImpulse(impulse)
 	}
 	if bit.IsBitOneAt(player.keycode, 1) {
-		impulse := player.rocket.Thrust(vec.Vec3Normal(vec.Vec3Scale(player.forward, -1.0)), 1.0, time_delta)
+		impulse := player.rocket.Thrust(vec.Vec3Normal(vec.Vec3Scale(player.Forward, -1.0)), 1.0, time_delta)
 		player.applyImpulse(impulse)
 	}
 	if bit.IsBitOneAt(player.keycode, 2) {

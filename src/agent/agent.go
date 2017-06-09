@@ -18,7 +18,7 @@ type Agent struct {
 	Pos vec.Vec3 `json:"pos"`
 	Target vec.Vec3 `json:"target"`
 
-	forward vec.Vec3
+	Forward vec.Vec3 `json:"forward"`
 	up vec.Vec3
 	right vec.Vec3
 
@@ -40,8 +40,8 @@ type Agent struct {
 
 func (agent *Agent) calculateDirectionVectors() {
 	up := vec.Vec3{0.0, 1.0, 0.0}
-	right := vec.Vec3Cross(agent.forward, up)
-	up = vec.Vec3Cross(right, agent.forward)
+	right := vec.Vec3Cross(agent.Forward, up)
+	up = vec.Vec3Cross(right, agent.Forward)
 	agent.up = up
 	agent.right = right
 }
@@ -65,11 +65,11 @@ func (agent *Agent) findClosestPlant(ents []Entity) Entity {
 }
 
 func (agent *Agent) calculateMovement(time_delta float64) {
-	var forward_norm = vec.Vec3Normal(agent.forward)
+	var Forward_norm = vec.Vec3Normal(agent.Forward)
 
 	var up = vec.Vec3{0.0, 1.0, 0.0}
-	var right = vec.Vec3Cross(forward_norm, up)
-	up = vec.Vec3Cross(forward_norm, right)
+	var right = vec.Vec3Cross(Forward_norm, up)
+	up = vec.Vec3Cross(Forward_norm, right)
 
 	agent.turn(time_delta)
 	agent.thrustForward(time_delta)
@@ -87,19 +87,19 @@ func (agent *Agent) turn(time_delta float64) {
 	var course = vec.Vec3Sub(agent.Target, agent.Pos)
 	var course_normal = vec.Vec3Normal(course)
 
-	var angle_diff = vec.Vec3AngleBetween(agent.forward, course_normal)
+	var angle_diff = vec.Vec3AngleBetween(agent.Forward, course_normal)
 	if angle_diff > math.Pi {
 		angle_diff = math.Pi
 	}
-	var axis = vec.Vec3Cross(agent.forward, course_normal)
+	var axis = vec.Vec3Cross(agent.Forward, course_normal)
 
 	var delta_turn = time_delta
-	var new_forward = vec.QuaternionRotation(agent.forward, delta_turn, axis)
-	agent.forward = new_forward
+	var new_Forward = vec.QuaternionRotation(agent.Forward, delta_turn, axis)
+	agent.Forward = new_Forward
 }
 
 func (agent *Agent) thrustForward(time_delta float64) {
-	impulse := agent.rocket.Thrust(vec.Vec3Normal(agent.forward), 1.0, time_delta)
+	impulse := agent.rocket.Thrust(vec.Vec3Normal(agent.Forward), 1.0, time_delta)
 	agent.applyImpulse(impulse)
 }
 
@@ -149,9 +149,9 @@ func (agent *Agent) Move(time_delta float64) {
 
 func (agent *Agent) Rotate(time_delta float64) {
 	angle_delta := vec.Vec3Scale(agent.angular_velocity, time_delta)
-	agent.forward = vec.QuaternionRotation(agent.forward, angle_delta.X, vec.Vec3{1.0, 0.0, 0.0})
-	agent.forward = vec.QuaternionRotation(agent.forward, angle_delta.Y, vec.Vec3{0.0, 1.0, 0.0})
-	agent.forward = vec.QuaternionRotation(agent.forward, angle_delta.Z, vec.Vec3{0.0, 0.0, 1.0})
+	agent.Forward = vec.QuaternionRotation(agent.Forward, angle_delta.X, vec.Vec3{1.0, 0.0, 0.0})
+	agent.Forward = vec.QuaternionRotation(agent.Forward, angle_delta.Y, vec.Vec3{0.0, 1.0, 0.0})
+	agent.Forward = vec.QuaternionRotation(agent.Forward, angle_delta.Z, vec.Vec3{0.0, 0.0, 1.0})
 }
 
 func (agent *Agent) Act(time_delta float64) {
