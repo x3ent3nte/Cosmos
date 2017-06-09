@@ -22,12 +22,10 @@ type Agent struct {
 	up vec.Vec3
 	right vec.Vec3
 
-	Roll float64 `json:"roll"`
-	Euler vec.Euler `json:"euler"`
-
 	velocity vec.Vec3
 	angular_velocity vec.Vec3
-	dist_delta vec.Vec3
+	Euler vec.Vec3 `json:"euler"`
+
 	mass float64
 	radius float64
 
@@ -38,12 +36,27 @@ type Agent struct {
 	rocket Rocket
 }
 
-func (agent *Agent) calculateDirectionVectors() {
-	up := vec.Vec3{0.0, 1.0, 0.0}
-	right := vec.Vec3Cross(agent.Forward, up)
-	up = vec.Vec3Cross(right, agent.Forward)
-	agent.up = up
-	agent.right = right
+func (agent *Agent) Orientate() {
+	pitch := agent.Euler.X
+	yaw := agent.Euler.Y
+	roll := agent.Euler.Z
+
+	z_axis := vec.Vec3{0.0, 0.0, -1.0}	
+	y_axis := vec.Vec3{0.0, 1.0, 0.0}
+	x_axis := vec.Vec3{1.0, 0.0, 0.0}
+
+	z_axis = vec.QuaternionRotation(z_axis, yaw, y_axis)
+	x_axis = vec.QuaternionRotation(x_axis, yaw, y_axis)
+
+	y_axis = vec.QuaternionRotation(y_axis, pitch, x_axis)
+	z_axis = vec.QuaternionRotation(z_axis, pitch, x_axis)
+
+	x_axis = vec.QuaternionRotation(x_axis, roll, z_axis)
+	y_axis = vec.QuaternionRotation(y_axis, roll, z_axis)
+
+	agent.Forward = z_axis
+	agent.up = y_axis
+	agent.right = x_axis
 }
 
 func (agent *Agent) findClosestPlant(ents []Entity) Entity {
@@ -64,18 +77,21 @@ func (agent *Agent) findClosestPlant(ents []Entity) Entity {
 	return closest
 }
 
-func (agent *Agent) calculateMovement(time_delta float64) {
-	var Forward_norm = vec.Vec3Normal(agent.Forward)
+func (agent *Agent) adjustVelocityAndRotation(time_delta float64) {
+	agent.thrustForward(time_delta)
+	agent.angular_velocity = vec.Vec3Add(agent.angular_velocity, vec.Vec3Scale(agent.angular_velocity, time_delta))
+}
 
-	var up = vec.Vec3{0.0, 1.0, 0.0}
-	var right = vec.Vec3Cross(Forward_norm, up)
-	up = vec.Vec3Cross(Forward_norm, right)
+func (agent *Agent) calculateMovement(time_delta float64) {
+	//var Forward_norm = vec.Vec3Normal(agent.Forward)
+
+	//var up = vec.Vec3{0.0, 1.0, 0.0}
+	//var right = vec.Vec3Cross(Forward_norm, up)
+	//up = vec.Vec3Cross(Forward_norm, right)
 
 	agent.turn(time_delta)
-	agent.thrustForward(time_delta)
-	//agent.stabilize(time_delta)
-
-	agent.dist_delta = vec.Vec3Scale(agent.velocity, time_delta)
+	//agent.thrustForward(time_delta)
+	agent.stabilize(time_delta)
 
 	if vec.Vec3DistanceBetween(agent.Target, agent.Pos) < 2000 {
 		agent.Target = vec.Vec3Add(agent.Pos, vec.Vec3Random(95000))
@@ -94,8 +110,7 @@ func (agent *Agent) turn(time_delta float64) {
 	var axis = vec.Vec3Cross(agent.Forward, course_normal)
 
 	var delta_turn = time_delta
-	var new_Forward = vec.QuaternionRotation(agent.Forward, delta_turn, axis)
-	agent.Forward = new_Forward
+	agent.Forward = vec.QuaternionRotation(agent.Forward, delta_turn, axis)
 }
 
 func (agent *Agent) thrustForward(time_delta float64) {
@@ -145,13 +160,8 @@ func (agent *Agent) applyTorque(force vec.Vec3, point vec.Vec3, time_delta float
 func (agent *Agent) Move(time_delta float64) {
 	dist := vec.Vec3Scale(agent.velocity, time_delta)
 	agent.Pos = vec.Vec3Add(agent.Pos, dist)
-}
 
-func (agent *Agent) Rotate(time_delta float64) {
-	angle_delta := vec.Vec3Scale(agent.angular_velocity, time_delta)
-	agent.Forward = vec.QuaternionRotation(agent.Forward, angle_delta.X, vec.Vec3{1.0, 0.0, 0.0})
-	agent.Forward = vec.QuaternionRotation(agent.Forward, angle_delta.Y, vec.Vec3{0.0, 1.0, 0.0})
-	agent.Forward = vec.QuaternionRotation(agent.Forward, angle_delta.Z, vec.Vec3{0.0, 0.0, 1.0})
+	agent.Euler = vec.Vec3Add(agent.Euler, vec.Vec3Scale(agent.angular_velocity, time_delta))
 }
 
 func (agent *Agent) Act(time_delta float64) {
@@ -179,6 +189,12 @@ func (agent *Agent) GetVelocity() vec.Vec3 {
 func (agent *Agent) AddVelocity(delta vec.Vec3) {
 	agent.Lock()
 	agent.velocity = vec.Vec3Add(agent.velocity, delta)
+	agent.Unlock()
+}
+
+func (agent *Agent) AddAngularVelocity(delta vec.Vec3) {
+	agent.Lock()
+	agent.angular_velocity = vec.Vec3Add(agent.angular_velocity, delta)
 	agent.Unlock()
 }
 

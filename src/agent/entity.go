@@ -16,9 +16,10 @@ type Entity interface {
 
 	Act(float64)
 	Move(float64)
-	Rotate(float64)
+	Orientate()
 	SetPos(vec.Vec3)
 	AddVelocity(vec.Vec3)
+	AddAngularVelocity(vec.Vec3)
 }
 
 type SortEntityXPos []Entity

@@ -3,28 +3,28 @@ package agent
 import (
 	"vec"
 	"sync"
-	"math"
+	//"math"
 )
 
-type Parasite struct{
+type Plant struct {
 	*Agent
 }
 
-func (para *Parasite) Act(time_delta float64) {
-	if para.age > para.lifespan  {
-		para.alive = false
+func (plant *Plant) Act(time_delta float64) {
+	if plant.age > plant.lifespan  {
+		plant.alive = false
 		return
 	} else {
-		para.calculateMovement(time_delta)
+		plant.calculateMovement(time_delta)
 	}
 }
 
-func SpawnParasite(odin *Odin, id int64, pos vec.Vec3) *Parasite{
+func SpawnPlant(odin *Odin, id int64, pos vec.Vec3) *Plant{
 	target := vec.Vec3Add(pos, vec.Vec3Random(9000))
 	agent := Agent{
 		sync.RWMutex{},
 		odin,
-		"parasite",
+		"plant",
 		id,
 
 		pos,
@@ -33,7 +33,7 @@ func SpawnParasite(odin *Odin, id int64, pos vec.Vec3) *Parasite{
 		vec.Vec3{0.0, 1.0, 0.0},
 		vec.Vec3{1.0, 0.0, 0.0},
 		0.0,
-		vec.Euler{math.Pi * 1.5, 0.0, 0.0}, 
+		vec.Vec3{0.0, 0.0, 0.0},
 
 		vec.Vec3{0.0, 0.0, 0.0},
 		vec.Vec3{0.0, 0.0, 0.0},
@@ -46,5 +46,5 @@ func SpawnParasite(odin *Odin, id int64, pos vec.Vec3) *Parasite{
 		10000,
 
 		CreateRocket()}
-	return &Parasite{&agent}
+	return &Plant{&agent}
 }

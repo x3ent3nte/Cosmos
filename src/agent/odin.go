@@ -56,8 +56,8 @@ func (odin *Odin) Simulate(time_delta float64) {
 func SimulateWorker(ents []Entity, time_delta float64, wg *sync.WaitGroup) {
 	for _, ent := range ents {
 		ent.Act(time_delta)
+		ent.Orientate()
 		ent.Move(time_delta)
-		ent.Rotate(time_delta)
 	}
 	wg.Done()
 }
@@ -114,10 +114,10 @@ func CreateOdin(initial_pop int, scope float64) Odin {
 
 		var ent Entity
 		if gen < 10 {
-			ent = SpawnParasite(&odin, id, pos)
+			ent = SpawnAnimal(&odin, id, pos)
 		} else {
 			if gen < 30 {
-				ent = SpawnPlant(&odin, id, pos)
+				ent = SpawnAnimal(&odin, id, pos)
 			} else {
 				ent = SpawnAnimal(&odin, id, pos)
 			}

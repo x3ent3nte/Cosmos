@@ -2,7 +2,7 @@ package agent
 
 import (
 	"vec"
-	"math"
+	//"math"
 	"sync"
 )
 
@@ -11,11 +11,15 @@ type Animal struct{
 }
 
 func (ani *Animal) Act(time_delta float64) {
+	if 1 == 1 {
+		//return
+	}
 	if ani.age > ani.lifespan {
 		ani.alive = false
 		return
 	} else {
 		_ = ani.odin.ents_spatial.SpatialGetZone(ani)
+		ani.adjustVelocityAndRotation(time_delta)
 		ani.calculateMovement(time_delta)
 		if ani.age == (ani.lifespan / 10) {
 			ani.Mitosis()
@@ -38,15 +42,15 @@ func SpawnAnimal(odin *Odin, id int64, pos vec.Vec3) *Animal{
 
 		pos,
 		target,
+
 		vec.Vec3{0.0, 0.0, -1.0},
 		vec.Vec3{0.0, 1.0, 0.0},
 		vec.Vec3{1.0, 0.0, 0.0},
-		0.0,
-		vec.Euler{math.Pi * 1.5, 0.0, 0.0}, 
+		
+		vec.Vec3{0.0, 0.0, 0.0}, 
+		vec.Vec3{0.0, 0.0, 0.0},
+		vec.Vec3{0.0, 0.0, 0.0},
 
-		vec.Vec3{0.0, 0.0, 0.0},
-		vec.Vec3{0.0, 0.0, 0.0},
-		vec.Vec3{0.0, 0.0, 0.0},
 		90.0, 
 		300.0,
 
