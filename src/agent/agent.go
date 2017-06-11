@@ -36,7 +36,7 @@ type Agent struct {
 	rocket Rocket
 }
 
-func (agent *Agent) Orientate() {
+func (agent *Agent) Orientate2() {
 	pitch := agent.Euler.X
 	yaw := agent.Euler.Y
 	roll := agent.Euler.Z
@@ -57,7 +57,7 @@ func (agent *Agent) Orientate() {
 
 }
 
-func (agent *Agent) Orientate2() {
+func (agent *Agent) Orientate() {
 	pitch := agent.Euler.X
 	yaw := agent.Euler.Y
 	roll := agent.Euler.Z
