@@ -7,7 +7,7 @@ window.onload = function() {
     }
 
     function createBox() {
-        var geometry = new THREE.BoxGeometry(500, 500, 500);
+        var geometry = new THREE.BoxGeometry(500, 500, 1000);
         var material = new THREE.MeshLambertMaterial( {color: 0x00ff00} );
         return new THREE.Mesh(geometry, material);
     }
@@ -126,7 +126,7 @@ window.onload = function() {
     var socket = new WebSocket("ws://localhost:8000/ws");
     socket.binaryType = "arraybuffer";
 
-    var id = -1;
+    var my_id = -1;
     var world_data = [];
 
     function updateWorld(ents) {
@@ -135,13 +135,19 @@ window.onload = function() {
             var id = ent.id;
 
             if (!(id in meshes)) {
-                var sphere = createBox();
+                var sphere = createSphere();
                 meshes[id] = sphere;
                 scene.add(sphere);
             }
 
             var mesh = meshes[id];
             mesh.position.set(ent.pos.x, ent.pos.y, ent.pos.z);
+            mesh.rotation.set(ent.euler.x, ent.euler.y, ent.euler.z, "YXZ");
+
+            if (ent.type === "player") {
+                camera.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
+                camera.rotation.set(ent.euler.x, ent.euler.y, ent.euler.z, "YXZ");
+            }
 
             //var quaternion = new THREE.Quaternion();
             //quaternion.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), Math.PI / 2 );
@@ -171,7 +177,7 @@ window.onload = function() {
     socket.onmessage = function(message) {
         var msg = JSON.parse(message.data);
         if (msg.type == "id") {
-            id = msg.data;
+            my_id = msg.data;
         }
         if (msg.type == "update") {
             world_data = msg.data;
@@ -186,9 +192,19 @@ window.onload = function() {
         if(pressed_keys[68]) { msg = setBitAt(msg, 3); } // D
         if(pressed_keys[81]) { msg = setBitAt(msg, 4); } // Q
         if(pressed_keys[69]) { msg = setBitAt(msg, 5); } // E
-    
+
+        if(pressed_keys[73]) { msg = setBitAt(msg, 6); } // I
+        if(pressed_keys[75]) { msg = setBitAt(msg, 7); } // K
+        if(pressed_keys[74]) { msg = setBitAt(msg, 8); } // J
+        if(pressed_keys[76]) { msg = setBitAt(msg, 9); } // L
+
+        if(pressed_keys[85]) { msg = setBitAt(msg, 10); } // U
+        if(pressed_keys[79]) { msg = setBitAt(msg, 11); } // O
+        
         msg_arr = [msg];
-        data = new Uint8Array(msg_arr);
+        var data = new Uint8Array(2);
+        data[0] = msg & 255;
+        data[1] = msg >> 8;
         socket.send(data.buffer);
     }
 

@@ -12,13 +12,17 @@ type Quaternion struct {
 	K float64
 }
 
-func QuaternionCreate(theta float64, vec Vec3) Quaternion {
-	var ijk = Vec3Scale(vec, math.Sin(theta / 2))
+func QuaternionCreate(theta float64, axis Vec3) Quaternion {
+	var ijk = Vec3Scale(axis, math.Sin(theta / 2))
 	return Quaternion{math.Cos(theta / 2), ijk.X, ijk.Y, ijk.Z}
 }
 
-func QuaternionRotation(point Vec3, theta float64, axis Vec3) Vec3{
+func AxisAngleRotation(point Vec3, theta float64, axis Vec3) Vec3{
 	var q = QuaternionCreate(theta, axis)
+	return QuaternionRotation(point, q)
+}
+
+func QuaternionRotation(point Vec3, q Quaternion) Vec3 {
 	var q_inverse = QuaternionInverse(q)
 	var point_quaternion = QuaternionFromVec3(point)
 	var rotated = HamiltonProduct(HamiltonProduct(q, point_quaternion), q_inverse)

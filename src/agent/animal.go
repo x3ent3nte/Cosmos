@@ -12,14 +12,13 @@ type Animal struct{
 
 func (ani *Animal) Act(time_delta float64) {
 	if 1 == 1 {
-		//return
+		return
 	}
 	if ani.age > ani.lifespan {
 		ani.alive = false
 		return
 	} else {
 		_ = ani.odin.ents_spatial.SpatialGetZone(ani)
-		ani.adjustVelocityAndRotation(time_delta)
 		ani.calculateMovement(time_delta)
 		if ani.age == (ani.lifespan / 10) {
 			ani.Mitosis()

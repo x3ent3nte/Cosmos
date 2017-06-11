@@ -80,7 +80,13 @@ func (server *Server) handleConnections(write http.ResponseWriter, read *http.Re
 				server.RemoveClient(client)
 				break
 			}
-			client.setKeycode(int(msg[0]))
+			keycode := 0;
+			factor := 1
+			for i := 0; i < len(msg); i++ {
+				keycode += int(msg[i]) * factor
+				factor *= 256
+			}
+			client.setKeycode(keycode)
 		}
 		conn.Close()
 	}(&client)
