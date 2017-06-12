@@ -29,9 +29,7 @@ func Vec3Mag(a Vec3) float64 {
 }
 
 func Vec3Normal(a Vec3) Vec3 {
-	var mag = Vec3Mag(a)
-
-	return Vec3Scale(a, 1.0 / mag)
+	return Vec3Scale(a, 1.0 / Vec3Mag(a))
 }
 
 func Vec3Dot(a Vec3, b Vec3) float64 {
@@ -63,7 +61,7 @@ func Vec3AngleBetween(a Vec3, b Vec3) float64 {
 }
 
 func Vec3Yaw(a Vec3) float64 {
-	return math.Atan2(a.Z, a.X)
+	return -math.Atan2(a.X, -a.Z)
 }
 
 func Vec3Pitch(a Vec3) float64 {

@@ -41,6 +41,38 @@ func Vec3FromQuaternion(q Quaternion) Vec3 {
 	return Vec3{q.I, q.J, q.K}
 }
 
+func AxisAngleFromQuaternion(q Quaternion) (float64, Vec3) {
+	mag := QuaterionMag(q)
+	axis := Vec3Scale(Vec3FromQuaternion(q), 1 / mag)
+	theta := 2 * math.Atan2(mag, q.R)
+	return theta, axis
+}
+
+func AxisAngleFromQuaternion2(q Quaternion) (float64, Vec3) {
+	theta := math.Acos(q.R) * 2
+	axis := Vec3Scale(Vec3FromQuaternion(q), 1 / math.Sin(theta / 2))
+	return theta, axis
+}
+
+func QuaternionBetweenVectors(a Vec3, b Vec3) Quaternion {
+	cross := Vec3Cross(a, b)
+	q := QuaternionFromVec3(cross)
+	q.R = math.Sqrt(math.Pow(Vec3Mag(a), 2) * math.Pow(Vec3Mag(b), 2)) + Vec3Dot(a, b)
+	return QuaternionNormal(q)
+}
+
+func QuaternionNormal(q Quaternion) Quaternion {
+	return QuaterionScale(q, 1 / QuaterionMag(q))
+}
+
+func QuaterionMag(q Quaternion) float64 {
+	return math.Sqrt((q.R * q.R) +  (q.I * q.I) + (q.J * q.J) + (q.K * q.K))
+}
+
+func QuaterionScale(q Quaternion, f float64) Quaternion {
+	return Quaternion{q.R * f, q.I * f, q.J * f, q.K * f}
+}
+ 
 func HamiltonProduct(a Quaternion, b Quaternion) Quaternion {
 	var r = (a.R * b.R) - (a.I * b.I) - (a.J * b.J) - (a.K * b.K)
 	var i = (a.R * b.I) + (a.I * b.R) + (a.J * b.K) - (a.K * b.J)

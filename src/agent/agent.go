@@ -36,7 +36,7 @@ type Agent struct {
 	rocket Rocket
 }
 
-func (agent *Agent) Orientate2() {
+func (agent *Agent) Orientate() {
 	pitch := agent.Euler.X
 	yaw := agent.Euler.Y
 	roll := agent.Euler.Z
@@ -49,7 +49,7 @@ func (agent *Agent) Orientate2() {
 	q_pitch := vec.QuaternionCreate(pitch, x_axis)
 	q_roll := vec.QuaternionCreate(-roll, z_axis)
 
-	q_combine := vec.HamiltonProduct(q_roll, vec.HamiltonProduct(q_pitch, q_yaw))
+	q_combine := vec.HamiltonProduct(q_yaw, vec.HamiltonProduct(q_pitch, q_roll))
 
 	agent.Forward = vec.QuaternionRotation(z_axis, q_combine)
 	agent.right = vec.QuaternionRotation(x_axis, q_combine)
@@ -57,7 +57,18 @@ func (agent *Agent) Orientate2() {
 
 }
 
-func (agent *Agent) Orientate() {
+func YPRfromForwardUpRight(forward vec.Vec3, up vec.Vec3, right vec.Vec3) vec.Vec3 {
+	yaw := vec.Vec3Yaw(forward)
+	pitch := vec.Vec3Pitch(forward)
+
+	zero_up := vec.AxisAngleRotation(vec.Vec3{0.0, 1.0, 0.0}, pitch, right)
+	roll, _ := vec.AxisAngleFromQuaternion(vec.QuaternionBetweenVectors(up, zero_up))
+	pyr := vec.Vec3{pitch, yaw, roll}
+	fmt.Println("PYR: ", pyr)
+	return pyr
+}
+
+func (agent *Agent) Orientate2() {
 	pitch := agent.Euler.X
 	yaw := agent.Euler.Y
 	roll := agent.Euler.Z
@@ -66,18 +77,18 @@ func (agent *Agent) Orientate() {
 	y_axis := vec.Vec3{0.0, 1.0, 0.0}
 	x_axis := vec.Vec3{1.0, 0.0, 0.0}
 
-	z_axis = vec.AxisAngleRotation(z_axis, yaw, y_axis)
-	x_axis = vec.AxisAngleRotation(x_axis, yaw, y_axis)
+	z_axis2 := vec.AxisAngleRotation(z_axis, yaw, y_axis)
+	x_axis2 := vec.AxisAngleRotation(x_axis, yaw, y_axis)
 
-	y_axis = vec.AxisAngleRotation(y_axis, pitch, x_axis)
-	z_axis = vec.AxisAngleRotation(z_axis, pitch, x_axis)
+	y_axis2 := vec.AxisAngleRotation(y_axis, pitch, x_axis2)
+	z_axis3 := vec.AxisAngleRotation(z_axis2, pitch, x_axis2)
 
-	x_axis = vec.AxisAngleRotation(x_axis, -roll, z_axis)
-	y_axis = vec.AxisAngleRotation(y_axis, -roll, z_axis)
+	x_axis3 := vec.AxisAngleRotation(x_axis2, -roll, z_axis3)
+	y_axis3 := vec.AxisAngleRotation(y_axis2, -roll, z_axis3)
 
-	agent.Forward = z_axis
-	agent.up = y_axis
-	agent.right = x_axis
+	agent.Forward = z_axis3
+	agent.up = y_axis3
+	agent.right = x_axis3
 }
 
 func (agent *Agent) findClosestPlant(ents []Entity) Entity {

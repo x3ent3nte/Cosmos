@@ -145,7 +145,8 @@ window.onload = function() {
             mesh.rotation.set(ent.euler.x, ent.euler.y, ent.euler.z, "YXZ");
 
             if (ent.type === "player") {
-                camera.position.set(mesh.position.x - (ent.forward.x * 4500), mesh.position.y - (ent.forward.y * 4500) + 1000, mesh.position.z - (ent.forward.z * 4500));
+                camera.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
+                //camera.position.set(mesh.position.x - (ent.forward.x * 4500), mesh.position.y - (ent.forward.y * 4500) + 1000, mesh.position.z - (ent.forward.z * 4500));
                 camera.rotation.set(ent.euler.x, ent.euler.y, ent.euler.z, "YXZ");
             }
 

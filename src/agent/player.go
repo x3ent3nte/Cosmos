@@ -4,6 +4,8 @@ import (
 	"vec"
 	"sync"
 	"bit"
+	"fmt"
+	//"math"
 )
 
 type Player struct {
@@ -13,10 +15,13 @@ type Player struct {
 }
 
 func (player *Player) Act(time_delta float64) {
+	fmt.Println("Speed: ", vec.Vec3Mag(player.velocity), "m/s")
 	player.keyActions(time_delta)
 }
 
 func (player *Player) keyActions(time_delta float64) {
+	fmt.Println("Orientation: ", player.Euler)
+	fmt.Println("Vyaw: ", vec.Vec3Yaw(player.Forward), " Vpitch: ", vec.Vec3Pitch(player.Forward))
 	if bit.IsBitOneAt(player.keycode, 0) { // W
 		impulse := player.rocket.Thrust(vec.Vec3Normal(player.Forward), 1.0, time_delta)
 		player.applyImpulse(impulse)
@@ -44,32 +49,36 @@ func (player *Player) keyActions(time_delta float64) {
 		player.applyImpulse(impulse)
 	}
 
-	if bit.IsBitOneAt(player.keycode, 6) { // I
-		//pitch down
+	if bit.IsBitOneAt(player.keycode, 6) { // I pitch down
+		/*forward := vec.AxisAngleRotation(player.Forward, -0.01, player.right)
+		up := vec.AxisAngleRotation(player.up, -0.01, player.right)
+		pyr := YPRfromForwardUpRight(forward, up, player.right)
+		player.Euler = pyr*/
 		player.Euler.X -= 0.01
-		//player.angular_velocity.X = -1
 	} 
-	if bit.IsBitOneAt(player.keycode, 7) { // K
-		//pitch up
+	if bit.IsBitOneAt(player.keycode, 7) { // K pitch up
+		/*forward := vec.AxisAngleRotation(player.Forward, 0.01, player.right)
+		up := vec.AxisAngleRotation(player.up, 0.01, player.right)
+		pyr := YPRfromForwardUpRight(forward, up, player.right)
+		player.Euler = pyr*/
 		player.Euler.X += 0.01
-		//player.angular_velocity.X = 1
 	} 
-	if bit.IsBitOneAt(player.keycode, 8) { // J
-		//yaw left
+	if bit.IsBitOneAt(player.keycode, 8) { // J yaw left
+		/*forward := vec.AxisAngleRotation(player.Forward, +0.01, player.up)
+		player.Euler.X = vec.Vec3Pitch(forward)
+		player.Euler.Y = vec.Vec3Yaw(forward)*/
 		player.Euler.Y += 0.01
-		//player.angular_velocity.Y = 1
 	}
-	if bit.IsBitOneAt(player.keycode, 9) { // L
-		//yaw right
+	if bit.IsBitOneAt(player.keycode, 9) { // L yaw right
+		/*forward := vec.AxisAngleRotation(player.Forward, -0.01, player.up)
+		player.Euler.X = vec.Vec3Pitch(forward)
+		player.Euler.Y = vec.Vec3Yaw(forward)*/
 		player.Euler.Y -= 0.01
-		//player.angular_velocity.Y = -1
 	}
-	if bit.IsBitOneAt(player.keycode, 10) { // U
-		//roll left
+	if bit.IsBitOneAt(player.keycode, 10) { // U roll left
 		player.Euler.Z += 0.01
 	}
-	if bit.IsBitOneAt(player.keycode, 11) { // O
-		//roll right
+	if bit.IsBitOneAt(player.keycode, 11) { // O roll right
 		player.Euler.Z -= 0.01
 	}
 }
