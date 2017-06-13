@@ -123,7 +123,7 @@ window.onload = function() {
     document.onmousemove = mouseMotion;
     window.addEventListener("resize", onWindowResize, false);
 
-    var socket = new WebSocket("ws://localhost:8000/ws");
+    var socket = new WebSocket("ws://192.168.0.129:3000/ws");
     socket.binaryType = "arraybuffer";
 
     var my_id = -1;

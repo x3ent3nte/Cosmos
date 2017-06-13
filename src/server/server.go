@@ -50,12 +50,12 @@ func (server *Server) RemoveClient(client *Client) {
 }
 
 func (server *Server) GetClientsData() map[int64]int {
-	server.Lock()
+	//server.Lock()
 	data := make(map[int64]int)
 	for client := range server.clients {
 		data[client.id] = client.keycode
 	}
-	server.Unlock()
+	//server.Unlock()
 	return data
 }
 
@@ -88,6 +88,7 @@ func (server *Server) handleConnections(write http.ResponseWriter, read *http.Re
 			}
 			client.setKeycode(keycode)
 		}
+		log.Println("Client closed")
 		conn.Close()
 	}(&client)
 }
@@ -97,15 +98,22 @@ func (server *Server) StartServer() {
 	http.Handle("/", fs)
 	http.HandleFunc("/ws", server.handleConnections)
 
-	log.Println("http server started on :8000")
-	err := http.ListenAndServe(":8000", nil)
+	log.Println("http server started on :3000")
+	err := http.ListenAndServe(":3000", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
 }
 
 func CreateServer() Server{
-	return Server{sync.RWMutex{}, concurrent.CreateIdHandler(), make(map[*Client]bool), websocket.Upgrader{}}
+	ws := websocket.Upgrader{ 
+		ReadBufferSize:  1024,
+    	WriteBufferSize: 1024,
+    	CheckOrigin: func(r *http.Request) bool {
+        return true
+        },
+    }
+	return Server{sync.RWMutex{}, concurrent.CreateIdHandler(), make(map[*Client]bool), ws}
 }
 
 

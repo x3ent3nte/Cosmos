@@ -8,6 +8,7 @@ import (
 )
 
 type Odin struct {
+	sync.RWMutex
 	ids concurrent.IdHandler
 	players map[int64]*Player
 	ents []Entity
@@ -63,7 +64,9 @@ func SimulateWorker(ents []Entity, time_delta float64, wg *sync.WaitGroup) {
 }
 
 func (odin *Odin) AddEntity(ent Entity) {
+	odin.Lock()
 	odin.ents = append(odin.ents, ent)
+	odin.Unlock()
 }
 
 func (odin *Odin) GetEntityJSONData() []string {
@@ -105,7 +108,7 @@ func CreateOdin(initial_pop int, scope float64) Odin {
 	ents_spatial := CreateSpatialMap()
 	ids := concurrent.CreateIdHandler()
 
-	odin := Odin{ids, players, ents, ents_spatial}
+	odin := Odin{sync.RWMutex{}, ids, players, ents, ents_spatial}
 
 	for i := 0; i < len(ents); i++ {
 		pos := vec.Vec3Random(scope)
