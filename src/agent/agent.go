@@ -64,8 +64,8 @@ func (agent *Agent) calculateMovement(time_delta float64) {
 	agent.stabilize(time_delta)
 
 	if vec.Vec3DistanceBetween(agent.Target, agent.Pos) < 2000 {
-		agent.Target = vec.Vec3Add(agent.Pos, vec.Vec3Random(35000))
-		//agent.Target = vec.Vec3Random(35000)
+		//agent.Target = vec.Vec3Add(agent.Pos, vec.Vec3Random(35000))
+		agent.Target = vec.Vec3Random(80000)
 	}
 }
 

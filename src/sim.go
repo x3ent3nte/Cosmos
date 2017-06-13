@@ -16,8 +16,9 @@ func main() {
 
 	server := server.CreateServer()
 	go server.StartServer()
+	go server.ServeData()
 
-	odin := agent.CreateOdin(200, 40000)
+	odin := agent.CreateOdin(300, 80000)
 
 	var last = time.Now().UnixNano()
 
@@ -29,7 +30,7 @@ func main() {
 		client_data := server.GetClientsData()
 		odin.UpdatePlayerData(client_data)
 		odin.Simulate(time_delta)
-		server.ServeData(odin.GetEntityJSONData())
+		server.SetData(odin.GetEntityJSONData())
 
 		last = start
 

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"time"
 	"sync"
 	"log"
 	"net/http"
@@ -25,16 +26,26 @@ func (client *Client) setKeycode(new_keycode int) {
 
 type Server struct {
 	sync.RWMutex
+	upgrader websocket.Upgrader
 	ids concurrent.IdHandler
 	clients map[*Client]bool
-	upgrader websocket.Upgrader
+	data []string
 }
 
-func (server *Server) ServeData(data []string) {
-	msg := Message{"update", data}
-	for client := range server.clients {
-		client.conn.WriteJSON(msg)
+func (server *Server) ServeData() {
+	for {
+		msg := Message{"update", server.data}
+		for client := range server.clients {
+			client.conn.WriteJSON(msg)
+		}
+		time.Sleep(time.Millisecond * 1)
 	}
+}
+
+func (server *Server) SetData(data []string) {
+	server.Lock()
+	server.data = data
+	server.Unlock()
 }
 
 func (server *Server) AddClient(client *Client) {
@@ -113,7 +124,7 @@ func CreateServer() Server{
         return true
         },
     }
-	return Server{sync.RWMutex{}, concurrent.CreateIdHandler(), make(map[*Client]bool), ws}
+	return Server{sync.RWMutex{}, ws, concurrent.CreateIdHandler(), make(map[*Client]bool), make([]string, 0)}
 }
 
 
