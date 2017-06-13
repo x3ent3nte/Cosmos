@@ -65,7 +65,7 @@ func (agent *Agent) calculateMovement(time_delta float64) {
 
 	if vec.Vec3DistanceBetween(agent.Target, agent.Pos) < 2000 {
 		//agent.Target = vec.Vec3Add(agent.Pos, vec.Vec3Random(35000))
-		agent.Target = vec.Vec3Random(80000)
+		agent.Target = vec.Vec3Random(30000)
 	}
 }
 
@@ -84,7 +84,7 @@ func (agent *Agent) turn(time_delta float64) {
 }
 
 func (agent *Agent) thrustForward(time_delta float64) {
-	impulse := agent.rocket.Thrust(vec.Vec3Normal(agent.Forward), 0.4, time_delta)
+	impulse := agent.rocket.Thrust(vec.Vec3Normal(agent.Forward), 0.04, time_delta)
 	agent.applyImpulse(impulse)
 }
 
@@ -95,7 +95,7 @@ func (agent *Agent) stabilize(time_delta float64) {
 	var course_normal = vec.Vec3Normal(course_relative)
 	var force_dir = vec.AxisAngleRotation(velocity_normal, math.Pi, course_normal)
 
-	impulse := agent.rocket.Thrust(force_dir, 0.2, time_delta)
+	impulse := agent.rocket.Thrust(force_dir, 0.02, time_delta)
 	agent.applyImpulse(impulse)
 }
 

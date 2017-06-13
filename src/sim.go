@@ -18,7 +18,7 @@ func main() {
 	go server.StartServer()
 	go server.ServeData()
 
-	odin := agent.CreateOdin(300, 80000)
+	odin := agent.CreateOdin(120, 60000)
 
 	var last = time.Now().UnixNano()
 
