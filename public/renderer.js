@@ -145,15 +145,13 @@ window.onload = function() {
             mesh.rotation.set(ent.euler.x, ent.euler.y, ent.euler.z, "YXZ");
 
             if (ent.type === "player") {
-                camera.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
+                camera.position.set(0,0,0);
                 //camera.position.set(mesh.position.x - (ent.forward.x * 4500), mesh.position.y - (ent.forward.y * 4500) + 1000, mesh.position.z - (ent.forward.z * 4500));
-                camera.rotation.set(ent.euler.x, ent.euler.y, ent.euler.z, "YXZ");
+                //camera.rotation.set(ent.euler.x, ent.euler.y, ent.euler.z, "YXZ");
+                camera.lookAt(new THREE.Vector3(ent.forward.x, ent.forward.y, ent.forward.z));
+                camera.up.set(ent.up.x, ent.up.y, ent.up.z);
+                camera.position.set(mesh.position.x, mesh.position.y, mesh.position.z);
             }
-
-            //var quaternion = new THREE.Quaternion();
-            //quaternion.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), Math.PI / 2 );
-            //var vector = new THREE.Vector3( 1, 0, 0 );
-            //vector.applyQuaternion( quaternion );
 
             if (ent.type == "animal") {
                 mesh.material.color.setHex(0x6313E5);

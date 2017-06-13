@@ -11,9 +11,6 @@ type Animal struct{
 }
 
 func (ani *Animal) Act(time_delta float64) {
-	if 1 == 1 {
-		return
-	}
 	if ani.age > ani.lifespan {
 		ani.alive = false
 		return

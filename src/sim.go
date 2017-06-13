@@ -3,7 +3,7 @@ package main
 import (
 	"math/rand"
 	"time"
-	"log"
+	//"log"
 	"agent"
 	"server"
 )
@@ -14,7 +14,7 @@ func main() {
 	server := server.CreateServer()
 	go server.StartServer()
 
-	odin := agent.CreateOdin(1500, 400000)
+	odin := agent.CreateOdin(700, 400000)
 
 	var last = time.Now().UnixNano()
 
@@ -22,7 +22,7 @@ func main() {
 		start := time.Now().UnixNano()
 		time_delta := float64(start - last) / 1000000000.0
 
-		log.Println("time taken: " , time_delta, "  frames/sec: ", 1.0 / time_delta)
+		//log.Println("time taken: " , time_delta, "  frames/sec: ", 1.0 / time_delta)
 		client_data := server.GetClientsData()
 		odin.UpdatePlayerData(client_data)
 		odin.Simulate(time_delta)

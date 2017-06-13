@@ -56,7 +56,7 @@ func (odin *Odin) Simulate(time_delta float64) {
 func SimulateWorker(ents []Entity, time_delta float64, wg *sync.WaitGroup) {
 	for _, ent := range ents {
 		ent.Act(time_delta)
-		ent.Orientate()
+		//ent.Orientate()
 		ent.Move(time_delta)
 	}
 	wg.Done()

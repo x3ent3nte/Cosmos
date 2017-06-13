@@ -22,7 +22,7 @@ time dilation
 better front end
 
 send client local information
-player in world
+player in world V
 
 animals, parasites, plants, genetics V
 ents decelarate
