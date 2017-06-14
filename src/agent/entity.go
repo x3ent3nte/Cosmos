@@ -19,7 +19,7 @@ type Entity interface {
 	Orientate()
 	SetPos(vec.Vec3)
 	AddVelocity(vec.Vec3)
-	AddAngularVelocity(vec.Vec3)
+	AddAngularVelocity(vec.Quaternion)
 }
 
 type SortEntityXPos []Entity

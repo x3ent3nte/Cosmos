@@ -20,11 +20,11 @@ type Agent struct {
 
 	Forward vec.Vec3 `json:"forward"`
 	Up vec.Vec3 `json:"up"`
-	Right vec.Vec3 `json:"Right"`
+	right vec.Vec3
 
 	velocity vec.Vec3
-	angular_velocity vec.Vec3
-	Euler vec.Vec3 `json:"euler"`
+	rotation vec.Quaternion 
+	angular_velocity vec.Quaternion
 
 	mass float64
 	radius float64
@@ -34,10 +34,6 @@ type Agent struct {
 	lifespan int64
 
 	rocket Rocket
-}
-
-func (agent *Agent) Orientate() {
-	agent.Forward, agent.Up, agent.Right = vec.FURFromPYR(agent.Euler)
 }
 
 func (agent *Agent) findClosestPlant(ents []Entity) Entity {
@@ -129,7 +125,14 @@ func (agent *Agent) applyTorque(force vec.Vec3, point vec.Vec3, time_delta float
 
 func (agent *Agent) Move(time_delta float64) {
 	agent.Pos = vec.Vec3Add(agent.Pos, vec.Vec3Scale(agent.velocity, time_delta))
-	agent.Euler = vec.Vec3Add(agent.Euler, vec.Vec3Scale(agent.angular_velocity, time_delta))
+	//agent.Rotation = vec.HamiltonProduct(agent.Rotation, agent.angular_velocity)
+	//agent.Orientate()
+}
+
+func (agent *Agent) Orientate() {
+	agent.Forward = vec.QuaternionRotation(agent.Forward, agent.angular_velocity)
+	agent.Up = vec.QuaternionRotation(agent.Up, agent.angular_velocity)
+	agent.right = vec.QuaternionRotation(agent.right, agent.angular_velocity)
 }
 
 func (agent *Agent) Act(time_delta float64) {
@@ -160,9 +163,9 @@ func (agent *Agent) AddVelocity(delta vec.Vec3) {
 	agent.Unlock()
 }
 
-func (agent *Agent) AddAngularVelocity(delta vec.Vec3) {
+func (agent *Agent) AddAngularVelocity(delta vec.Quaternion) {
 	agent.Lock()
-	agent.angular_velocity = vec.Vec3Add(agent.angular_velocity, delta)
+	agent.angular_velocity = vec.HamiltonProduct(agent.angular_velocity, delta)
 	agent.Unlock()
 }
 

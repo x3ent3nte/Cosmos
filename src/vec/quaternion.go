@@ -7,10 +7,10 @@ import (
 )
 
 type Quaternion struct {
-	R float64
-	I float64
-	J float64
-	K float64
+	R float64 `json:"r"`
+	I float64 `json:"i"`
+	J float64 `json:"j"`
+	K float64 `json:"k"`
 }
 
 func QuaternionCreate(theta float64, axis Vec3) Quaternion {
@@ -118,7 +118,7 @@ func HamiltonProduct(a Quaternion, b Quaternion) Quaternion {
 	var j = (a.R * b.J) - (a.I * b.K) + (a.J * b.R) + (a.K * b.I)
 	var k = (a.R * b.K) + (a.I * b.J) - (a.J * b.I) + (a.K * b.R)
 
-	return Quaternion{r, i, j, k}
+	return QuaternionNormal(Quaternion{r, i, j, k})
 }
 
 func QuaternionToString(q Quaternion) string {

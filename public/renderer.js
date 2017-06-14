@@ -141,8 +141,10 @@ window.onload = function() {
             }
 
             var mesh = meshes[id];
+            mesh.position.set(0,0,0);
+            mesh.lookAt(new THREE.Vector3(ent.forward.x, ent.forward.y, ent.forward.z))
+            camera.up.set(ent.up.x, ent.up.y, ent.up.z);
             mesh.position.set(ent.pos.x, ent.pos.y, ent.pos.z);
-            mesh.rotation.set(ent.euler.x, ent.euler.y, ent.euler.z, "YXZ");
 
             if (ent.type === "player") {
                 camera.position.set(0,0,0);
@@ -154,12 +156,12 @@ window.onload = function() {
             }
 
             if (ent.type == "animal") {
-                mesh.material.color.setHex(0x6313E5);
+                mesh.material.color.setHex(0x3CD022);
             } else {
                 if (ent.type == "plant") {
                     mesh.material.color.setHex(0x3EC70E);
                 } else {
-                    mesh.material.color.setHex(0xC70E0E);
+                    mesh.material.color.setHex(0x6313E5);
                 }
             }
         }
@@ -173,7 +175,7 @@ window.onload = function() {
         console.log("connection closed (" + e.code + ")");
     }
 
-    socket.onmessage = function(message) {
+    socket.onmessage = function(message) { 
         var msg = JSON.parse(message.data);
         if (msg.type == "id") {
             my_id = msg.data;

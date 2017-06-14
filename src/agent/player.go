@@ -29,11 +29,11 @@ func (player *Player) keyActions(time_delta float64) {
 		player.applyImpulse(impulse)
 	}
 	if bit.IsBitOneAt(player.keycode, 2) { // A
-		impulse := player.rocket.Thrust(vec.Vec3Normal(vec.Vec3Scale(player.Right, -1.0)), 1.0, time_delta)
+		impulse := player.rocket.Thrust(vec.Vec3Normal(vec.Vec3Scale(player.right, -1.0)), 1.0, time_delta)
 		player.applyImpulse(impulse)
 	}
 	if bit.IsBitOneAt(player.keycode, 3) { // D
-		impulse := player.rocket.Thrust(vec.Vec3Normal(player.Right), 1.0, time_delta)
+		impulse := player.rocket.Thrust(vec.Vec3Normal(player.right), 1.0, time_delta)
 		player.applyImpulse(impulse)
 	}
 	if bit.IsBitOneAt(player.keycode, 4) { //Q
@@ -45,30 +45,42 @@ func (player *Player) keyActions(time_delta float64) {
 		player.applyImpulse(impulse)
 	}
 
-	turn_rate := 1.2 * time_delta
+	turn_rate := 1 * time_delta
 	if bit.IsBitOneAt(player.keycode, 6) { // I pitch down
-		player.Up = vec.AxisAngleRotation(player.Up, -turn_rate, player.Right)
-		player.Forward = vec.AxisAngleRotation(player.Forward, -turn_rate, player.Right)
+		player.Forward = vec.AxisAngleRotation(player.Forward, -turn_rate, player.right)
+		player.Up = vec.AxisAngleRotation(player.Up, -turn_rate, player.right)
+		//delta := vec.QuaternionCreate(-turn_rate, player.Right)
+		//player.AddAngularVelocity(delta)
 	} 
 	if bit.IsBitOneAt(player.keycode, 7) { // K pitch up
-		player.Up = vec.AxisAngleRotation(player.Up, turn_rate, player.Right)
-		player.Forward = vec.AxisAngleRotation(player.Forward, turn_rate, player.Right)
+		player.Forward = vec.AxisAngleRotation(player.Forward, turn_rate, player.right)
+		player.Up = vec.AxisAngleRotation(player.Up, turn_rate, player.right)
+		//delta := vec.QuaternionCreate(turn_rate, player.Right)
+		//player.AddAngularVelocity(delta)
 	} 
 	if bit.IsBitOneAt(player.keycode, 8) { // J yaw left
-		player.Right = vec.AxisAngleRotation(player.Right, turn_rate, player.Up)
 		player.Forward = vec.AxisAngleRotation(player.Forward, turn_rate, player.Up)
+		player.right = vec.AxisAngleRotation(player.right, turn_rate, player.Up)
+		//delta := vec.QuaternionCreate(turn_rate, player.Up)
+		//player.AddAngularVelocity(delta)
 	}
 	if bit.IsBitOneAt(player.keycode, 9) { // L yaw right
-		player.Right = vec.AxisAngleRotation(player.Right, -turn_rate, player.Up)
 		player.Forward = vec.AxisAngleRotation(player.Forward, -turn_rate, player.Up)
+		player.right = vec.AxisAngleRotation(player.right, -turn_rate, player.Up)
+		//delta := vec.QuaternionCreate(-turn_rate, player.Up)
+		//player.AddAngularVelocity(delta)
 	}
 	if bit.IsBitOneAt(player.keycode, 10) { // U roll left
-		player.Right = vec.AxisAngleRotation(player.Right, -turn_rate, player.Forward)
 		player.Up = vec.AxisAngleRotation(player.Up, -turn_rate, player.Forward)
+		player.right = vec.AxisAngleRotation(player.right, -turn_rate, player.Forward)
+		//delta := vec.QuaternionCreate(-turn_rate, player.Forward)
+		//player.AddAngularVelocity(delta)
 	}
 	if bit.IsBitOneAt(player.keycode, 11) { // O roll right
-		player.Right = vec.AxisAngleRotation(player.Right, turn_rate, player.Forward)
 		player.Up = vec.AxisAngleRotation(player.Up, turn_rate, player.Forward)
+		player.right = vec.AxisAngleRotation(player.right, turn_rate, player.Forward)
+		//delta := vec.QuaternionCreate(turn_rate, player.Forward)
+		//player.AddAngularVelocity(delta)
 	}
 }
 
@@ -91,8 +103,8 @@ func SpawnPlayer(odin *Odin, client_id int64, id int64, pos vec.Vec3) *Player {
 		vec.Vec3{1.0, 0.0, 0.0},
 
 		vec.Vec3{0.0, 0.0, 0.0}, 
-		vec.Vec3{0.0, 0.0, 0.0},
-		vec.Vec3{0.0, 0.0, 0.0},
+		vec.QuaternionCreate(0.0, vec.Vec3{0.0, 0.0, -1.0}),
+		vec.QuaternionCreate(0.00, vec.Vec3{1.0, 0.0, 0.0}),
 
 		90.0, 
 		300.0,

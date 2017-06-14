@@ -47,8 +47,8 @@ func SpawnAnimal(odin *Odin, id int64, pos vec.Vec3) *Animal{
 		vec.Vec3{1.0, 0.0, 0.0},
 		
 		vec.Vec3{0.0, 0.0, 0.0}, 
-		vec.Vec3{0.0, 0.0, 0.0},
-		vec.Vec3{0.0, 0.0, 0.0},
+		vec.QuaternionCreate(0.0, vec.Vec3{0.0, 0.0, -1.0}),
+		vec.QuaternionCreate(0.0, vec.Vec3{0.0, 0.0, -1.0}),
 
 		90.0, 
 		300.0,

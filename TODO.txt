@@ -22,6 +22,5 @@ AABB polygon collisions
 send world state data more efficiently (binary instead of json)
 
 quaternion rotations
-
 planets / gravity
 
